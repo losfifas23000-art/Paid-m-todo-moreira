@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 MÉTODO MOREIRA — PREMIUM ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Variables de Color para fácil edición */
+  :root {
+    --color-primary: #FFB700; /* Amarillo Dorado Premium */
+    --color-secondary: #FF8800; /* Tono Naranja para acentos */
+    --color-background: #121212; /* Negro Profundo Premium */
+    --color-card-bg: rgba(255, 255, 255, 0.05); /* Fondo de tarjeta sutil */
+    --color-text: #E0E0E0; /* Gris Claro para texto */
+    --color-light: #FFFFFF;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 0; /* Removido padding para el modal */
+    margin: 0;
+    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden; /* Oculta el scroll al inicio */
+  }
+
+  /* --- Estilos para el Modal de Acceso (NUEVO) --- */
+  #access-gate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-background); /* Fondo oscuro */
+    z-index: 1000; /* Asegura que esté por encima de todo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .access-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--color-primary);
+  }
+
+  .access-box h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+    text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+  }
+
+  #access-key-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid var(--color-secondary);
+    border-radius: 8px;
+    background-color: #202020;
+    color: var(--color-light);
+    font-size: 18px;
+    text-align: center;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+
+  #access-key-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .access-btn {
+    background-image: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-background);
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+  }
+
+  .access-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+  
+  #error-message {
+    color: red;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  /* El contenido real inicia oculto y se hace visible con JS */
+  #main-content {
+    padding: 60px 20px;
+    display: none; /* Inicia oculto */
+  }
+
+  /* --- Estilos Existentes (Adaptados) --- */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--color-primary);
+    text-shadow: 0 0 25px var(--color-secondary), 0 0 10px rgba(255, 183, 0, 0.5);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--color-light);
+    margin-top: 0;
+    margin-bottom: 50px;
+    letter-spacing: 5px;
+  }
+  
+  /* [El resto de tus estilos (.brainrot-container, .brainrot, .go-btn, .live-servers, etc.) sigue aquí...] */
+
+  .brainrot-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px; /* Más espacio entre elementos */
+    margin-bottom: 40px;
+  }
+
+  .brainrot {
+    background: var(--color-card-bg);
+    border-radius: 20px; /* Bordes más redondeados */
+    width: 280px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    border: 3px solid transparent; /* Más grueso para el borde */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .brainrot:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px) scale(1.03); /* Elevación sutil */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+
+  .brainrot img {
+    width: 90px;
+    height: 90px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    /* Borde dorado sutil en la imagen */
+    border: 3px solid var(--color-secondary);
+    object-fit: cover;
+  }
+
+  .brainrot span {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--color-light);
+    margin-bottom: 5px;
+  }
+
+  .time {
+    color: var(--color-primary);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* Estilo de selección más impactante */
+  .brainrot.selected {
+    border: 3px solid var(--color-primary);
+    background: rgba(255, 183, 0, 0.15); /* Fondo más claro en selección */
+    box-shadow: 0 0 20px var(--color-primary), 0 0 5px var(--color-secondary);
+    transform: scale(1.05);
+  }
+
+  /* Botón Principal (CTA) */
+  .go-btn {
+    margin-top: 50px;
+    background-image: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-background); /* Texto oscuro en botón brillante */
+    border: none;
+    padding: 18px 50px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+    letter-spacing: 1px;
+  }
+
+  .go-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 183, 0, 0.6);
+    opacity: 0.95;
+  }
+
+  /* Sección de Servidores en Vivo */
+  .live-servers {
+    margin-top: 80px;
+    background: rgba(255, 255, 255, 0.03); /* Fondo muy sutil */
+    border-radius: 25px; /* Bordes más elegantes */
+    padding: 40px;
+    border: 1px solid rgba(255, 183, 0, 0.2); /* Borde delgado dorado */
+    box-shadow: inset 0 0 10px rgba(255, 183, 0, 0.1);
+  }
+
+  .live-servers h3 {
+    font-size: 28px;
+    color: var(--color-primary);
+    text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .server-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    margin: 15px 0;
+    padding: 15px 20px;
+    transition: background 0.3s, transform 0.3s;
+    border-left: 5px solid var(--color-primary); /* Borde de acento izquierdo */
+  }
+
+  .server-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+  }
+
+  .server-item span:first-child {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .server-item span:nth-child(2) {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-secondary); /* Color del rendimiento */
+  }
+
+  .join-btn {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .join-btn:hover {
+    background-color: var(--color-secondary);
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body>
+
+<div id="access-gate">
+    <div class="access-box">
+        <h2>🔒 ACCESO RESTRINGIDO ELITE</h2>
+        <p>Introduce tu llave de acceso premium para continuar.</p>
+        <input type="text" id="access-key-input" placeholder="Llave de Acceso">
+        <button class="access-btn" onclick="checkAccessKey()">Desbloquear Acceso</button>
+        <p id="error-message" style="display: none;">Llave incorrecta. Inténtalo de nuevo.</p>
+    </div>
+</div>
+<div id="main-content">
+  <div class="container">
+    <h1>🚀 MÉTODO MOREIRA ELITE 💎</h1>
+    <h2>PREMIUM ACCESS</h2>
+
+    <p>Selecciona tu **Brainrot de Alto Rendimiento** para activar la conexión *Elite*:</p>
+
+    <div class="brainrot-container" id="brainrots">
+      </div>
+
+    <button class="go-btn" onclick="goToRandomServer()">ACCESO INMEDIATO</button>
+
+    <div class="live-servers" id="liveServers">
+      <h3>🌐 SERVIDORES ELITE EN VIVO (BAJO PING)</h3>
+      <div id="serversList">
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+  // 🔑 Llaves de acceso válidas (se convierten a minúsculas para una comprobación flexible)
+  const VALID_KEYS = [
+    "18273-81271-193729",
+    "91271-18731-8183182",
+    "18271-18282-1827222",
+    "19282-28323-192288",
+    "19222-192811-1929192",
+    "56-56-56"
+  ].map(key => key.toLowerCase());
+
+  const accessGate = document.getElementById('access-gate');
+  const mainContent = document.getElementById('main-content');
+  const keyInput = document.getElementById('access-key-input');
+  const errorMessage = document.getElementById('error-message');
+
+  /**
+   * Verifica la llave introducida por el usuario.
+   */
+  function checkAccessKey() {
+    const enteredKey = keyInput.value.trim().toLowerCase();
+
+    if (VALID_KEYS.includes(enteredKey)) {
+      // Clave correcta: oculta el modal y muestra el contenido.
+      accessGate.style.display = 'none';
+      mainContent.style.display = 'block';
+      document.body.style.overflow = 'auto'; // Habilita el scroll
+      // Opcional: guardar el estado de acceso para que no pida la llave de nuevo (usando localStorage)
+      localStorage.setItem('has_premium_access', 'true');
+      
+    } else {
+      // Clave incorrecta: muestra el mensaje de error.
+      errorMessage.style.display = 'block';
+      keyInput.value = ''; // Limpia el input
+      keyInput.focus(); // Vuelve a enfocar el input
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+      }, 3000); // Oculta el mensaje después de 3 segundos
+    }
+  }
+
+  /**
+   * Intenta acceder automáticamente si la clave ya fue introducida.
+   * Si no, se mantiene en la puerta de acceso.
+   */
+  window.onload = function() {
+    const hasAccess = localStorage.getItem('has_premium_access');
+    if (hasAccess === 'true') {
+      accessGate.style.display = 'none';
+      mainContent.style.display = 'block';
+      document.body.style.overflow = 'auto';
+    } else {
+      // Asegura que la puerta de acceso esté visible si no hay acceso.
+      accessGate.style.display = 'flex';
+      keyInput.focus();
+    }
+  };
+
+  // Permite presionar Enter para desbloquear
+  keyInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+          checkAccessKey();
+      }
+  });
+
+
+  // 🔹 El resto de tu código JS existente (creación de brainrots, servidores, y funciones)
+  // ... (El resto del script original sigue aquí) ...
+  
+  // 🔹 Lista de servidores (sin cambios)
+  const servers = [
+    "https://www.roblox.com/share?code=cd3678ebc5c98b4fadc070577b580311&type=Server",
+    "https://www.roblox.com/share?code=8c962249378ada48978d11d45f15ca9d&type=Server",
+    "https://www.roblox.com/share?code=e7bffd5ac9d94740afd384e4aa70d229&type=Server",
+    "https://www.roblox.com/share?code=3bad87db2826f64f9ea7be5354137599&type=Server",
+    "https://www.roblox.com/share?code=5bdbfbf9111f814883357fe1814bb935&type=Server",
+    "https://www.roblox.com/share?code=e0dd046e2ea1bb488b35a8f31d61f6ab&type=Server",
+    "https://www.roblox.com/share?code=7f32c35656fa5d429161f1d2fcc5efa8&type=Server",
+    "https://www.roblox.com/share?code=130b69d791036247927d668834b4088a&type=Server",
+    "https://www.roblox.com/share?code=7e1ab84e28af1c469eadd988bb4884fa&type=Server",
+    "https://www.roblox.com/share?code=013245bab5cf204089ed850a0462f801&type=Server",
+    "https://www.roblox.com/share?code=c9b093fb59b9164484ce740a391a99d8&type=Server",
+    "https://www.roblox.com/share?code=37327eb1a673b644818cdf17936aecc5&type=Server",
+    "https://www.roblox.com/share?code=dad73431e0c2ab4e979dfa7d06a4c3d4&type=Server",
+    "https://www.roblox.com/share?code=3f69fe4fa10324429725ab8a42b08cfc&type=Server",
+    "https://www.roblox.com/share?code=08f077261f73104fb96f480af5747330&type=Server",
+    "https://www.roblox.com/share?code=66d2d4c625cb144a8f9b0b8a87aa6016&type=Server",
+    "https://www.roblox.com/share?code=b86f4c3b11f2f042959260c44ebde01b&type=Server",
+    "https://www.roblox.com/share?code=8cf4c33c52b84c46854b1448052f40d0&type=Server",
+    "https://www.roblox.com/share?code=aae4acf9d776cf4bb8cd14a44fc651d6&type=Server",
+    "https://www.roblox.com/share?code=0c6c1de9a223644786cca5a35afb0713&type=Server",
+    "https://www.roblox.com/share?code=8db4a426e6971048bd83f282120431f0&type=Server",
+    "https://www.roblox.com/share?code=a77e1624c7d17a4989132321718ed842&type=Server",
+    // NUEVOS LINKS AGREGADOS
+    "https://www.roblox.com/share?code=515ced9c36d00342a7e6ff53665e788e&type=Server",
+    "https://www.roblox.com/share?code=fcc4676f99b60146b48fe843cd36049e&type=Server",
+    "https://www.roblox.com/share?code=c90dc902462afe41b05e96d96992782f&type=Server",
+    "https://www.roblox.com/share?code=24036f15ccbc80408a5d8d09aaa078a7&type=Server",
+    "https://www.roblox.com/share?code=4f3e2ed9ec372744b28d3d19cca6a299&type=Server",
+    "https://www.roblox.com/share?code=ce24c3c7c4e8794cbf2c98f7d7f211c5&type=Server",
+    "https://www.roblox.com/share?code=185f0efb5db4ec4cb62207635561171a&type=Server",
+    "https://www.roblox.com/share?code=05a933eec8d48a48b9a82ecc82b03258&type=Server",
+    "https://www.roblox.com/share?code=0e2ca1a4597a964985454e002b757554&type=Server",
+    "https://www.roblox.com/share?code=5b9c14f6538863408074ed0dd495d3a8&type=Server",
+    "https://www.roblox.com/share?code=e7b1e77431d2554693e35629ceaef6df&type=Server",
+    "https://www.roblox.com/share?code=b1a4ff0046744a48b9e27a2c4b741f0a&type=Server",
+    "https://www.roblox.com/share?code=877d00ecd57cd546981f3d84d0b6df7d&type=Server",
+    "https://www.roblox.com/share?code=3a785eca1a661f43b41b34fcc6c212d1&type=Server",
+    "https://www.roblox.com/share?code=7fc1562d3560044c82cb87d85a6484cf&type=Server",
+    "https://www.roblox.com/share?code=17aa24422dc2b94c8e93a5913ac03aa8&type=Server",
+    "https://www.roblox.com/share?code=37efce05e5ac9142bf6bde644fa5f2a3&type=Server",
+    "https://www.roblox.com/share?code=4d335b746f9b4947b0c4a35dfd268750&type=Server",
+    "https://www.roblox.com/share?code=7203f94df3e7aa41912d2c6c6a6e7453&type=Server",
+    "https://www.roblox.com/share?code=70a00f798d49374e856652c1d831d8f5&type=Server",
+    "https://www.roblox.com/share?code=38a497a2d2e70a4286f7a23b61e28802&type=Server"
+  ];
+
+  // 🔹 Brainrots (RUTAS RELATIVAS MODIFICADAS)
+  const brainrots = [
+    { name: "Los Bros Elite", img: "./img/bros.png", min: [8, 15] },
+    { name: "Las Sis Gold", img: "./img/las_sis.png", min: [10, 20] },
+    { name: "Celularsini Diamond", img: "./img/celularsini.png", min: [12, 25] },
+    { name: "Garama & Mandundung PRO", img: "./img/garamadundung.png", min: [15, 28] },
+    { name: "Spaghetti Tualetti X", img: "./img/spaghettitualetti.png", min: [17, 30] },
+    { name: "Secret Combinación VIP", img: "./img/secretcombinacion.png", min: [20, 32] },
+    { name: "Dragon Cannelloni Max", img: "./img/dragoncanneloni.png", min: [25, 35] },
+    { name: "Burguru & Fryuru Ultra", img: "./img/burgurufryuru.png", min: [23, 33] }
+  ];
+
+  const container = document.getElementById("brainrots");
+
+  brainrots.forEach(b => {
+    // Tiempos ajustados para un look más "premium" (más rápido)
+    const randomTime = Math.floor(Math.random() * (b.min[1] - b.min[0] + 1)) + b.min[0];
+    const div = document.createElement("div");
+    div.classList.add("brainrot");
+    div.innerHTML = `<img src="${b.img}"><span>${b.name}</span><p class="time">⚡ ${randomTime} min</p>`;
+    div.onclick = () => selectBrainrot(div);
+    container.appendChild(div);
+  });
+
+  let selectedBrainrot = null;
+  function selectBrainrot(element) {
+    document.querySelectorAll('.brainrot').forEach(e => e.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedBrainrot = element.innerText;
+  }
+
+  function goToRandomServer() {
+    if (!selectedBrainrot) {
+      alert("Primero elige un Brainrot de Alto Rendimiento 👑");
+      return;
+    }
+    const randomLink = servers[Math.floor(Math.random() * servers.length)];
+    window.open(randomLink, "_blank");
+  }
+
+  // 🔹 SERVERS EN VIVO (con nombres ajustados para el toque premium)
+  const allServers = [
+    { name: "Los Combinacionas Prime", base: 25 },
+    { name: "Graipuss Medussi X-Treme", base: 10 },
+    { name: "Servidor Omega 67", base: 17 },
+    { name: "La Grande Combinación Ultra", base: 20 },
+    { name: "Ketchuru and Mosturu VIP", base: 50 },
+    { name: "Los Tralaleritos Turbo", base: 13 },
+    { name: "Las Tralaleritas Speed", base: 14 },
+    { name: "Quesadilla Cocodrila Gold", base: 18 },
+    { name: "Los Noooo My Hotspotsitos Fast", base: 15.5 }
+  ];
+
+  const serversList = document.getElementById("serversList");
+  // Multiplicadores más altos para el "Elite"
+  const multipliers = [5, 7, 10, 15, 20];
+
+  allServers.forEach(s => {
+    const chance = Math.random();
+    // Aumentar la probabilidad de que aparezcan (más servers "elite" activos)
+    if (chance > 0.3) {
+      const mult = multipliers[Math.floor(Math.random() * multipliers.length)];
+      // Valores más altos para el "M/S" para que parezca de rendimiento superior
+      const finalValue = (s.base * mult).toFixed(1);
+      const item = document.createElement("div");
+      item.classList.add("server-item");
+      item.innerHTML = `<span>${s.name}</span><span>${finalValue}M/S</span><button class="join-btn">Acceder</button>`;
+      item.querySelector(".join-btn").onclick = () => {
+        const randomLink = servers[Math.floor(Math.random() * servers.length)];
+        window.open(randomLink, "_blank");
+      };
+      serversList.appendChild(item);
+    }
+  });
+</script>
+
+</body>
+</html>
