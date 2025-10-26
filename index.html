@@ -3,17 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🛠️ MÉTODO MOREIRA — EN MANTENIMIENTO</title>
+<title>🚀 MÉTODO MOREIRA — PREMIUM ACCESS</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* Variables de Color (Mismas que el diseño principal) */
+  /* Variables de Color para fácil edición */
   :root {
     --color-primary: #FFB700; /* Amarillo Dorado Premium */
     --color-secondary: #FF8800; /* Tono Naranja para acentos */
     --color-background: #121212; /* Negro Profundo Premium */
+    --color-card-bg: rgba(255, 255, 255, 0.05); /* Fondo de tarjeta sutil */
     --color-text: #E0E0E0; /* Gris Claro para texto */
     --color-light: #FFFFFF;
-    --color-maintenance: #FF4500; /* Naranja rojizo para el mensaje */
+    --color-success: #17B978; /* Verde para confirmados */
+    --color-used: #6A6A6A; /* Gris para links usados */
   }
 
   body {
@@ -25,22 +27,95 @@
     margin: 0;
     line-height: 1.6;
     height: 100vh;
+    overflow: hidden; /* Oculta el scroll al inicio */
+  }
+
+  /* --- Estilos para el Modal de Acceso --- */
+  #access-gate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-background);
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 20px;
   }
 
-  /* Estilos del Contenedor de Mantenimiento */
-  .maintenance-container {
+  .access-box {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 60px 40px;
-    max-width: 600px;
+    padding: 40px;
+    max-width: 450px;
     width: 90%;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
-    border: 3px solid var(--color-primary);
-    animation: pulse 2s infinite; /* Animación sutil */
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--color-primary);
+  }
+
+  .access-box h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+    text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+  }
+
+  #access-key-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid var(--color-secondary);
+    border-radius: 8px;
+    background-color: #202020;
+    color: var(--color-light);
+    font-size: 18px;
+    text-align: center;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+
+  #access-key-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .access-btn {
+    background-image: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-background);
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+  }
+
+  .access-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+  
+  #error-message {
+    color: red;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  /* El contenido real inicia oculto y se hace visible con JS */
+  #main-content {
+    padding: 60px 20px;
+    display: none; /* Inicia oculto */
+  }
+
+  /* --- Estilos Existentes --- */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   h1 {
@@ -53,62 +128,440 @@
   }
 
   h2 {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--color-maintenance);
-    margin-top: 20px;
-    margin-bottom: 30px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--color-light);
+    margin-top: 0;
+    margin-bottom: 50px;
+    letter-spacing: 5px;
   }
-
+  
   p {
     font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .brainrot-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .brainrot {
+    background: var(--color-card-bg);
+    border-radius: 20px;
+    width: 280px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    border: 3px solid transparent;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .brainrot:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+
+  .brainrot img {
+    width: 90px;
+    height: 90px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    border: 3px solid var(--color-secondary);
+    object-fit: cover;
+  }
+
+  .brainrot span {
+    font-weight: 700;
+    font-size: 20px;
     color: var(--color-light);
+    margin-bottom: 5px;
   }
 
-  /* Animación de Parpadeo/Pulso */
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 20px rgba(255, 183, 0, 0.3), 0 0 5px rgba(255, 183, 0, 0.5);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(255, 183, 0, 0.8), 0 0 10px rgba(255, 183, 0, 0.9);
-    }
-    100% {
-      box-shadow: 0 0 20px rgba(255, 183, 0, 0.3), 0 0 5px rgba(255, 183, 0, 0.5);
-    }
+  .time {
+    color: var(--color-primary);
+    font-size: 16px;
+    font-weight: 600;
   }
 
-  /* Animación de carga (Opcional, pero genial) */
-  .loader {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid var(--color-primary);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+  .brainrot.selected {
+    border: 3px solid var(--color-primary);
+    background: rgba(255, 183, 0, 0.15);
+    box-shadow: 0 0 20px var(--color-primary), 0 0 5px var(--color-secondary);
+    transform: scale(1.05);
   }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  /* Botón Principal (CTA) */
+  .go-btn {
+    margin-top: 50px;
+    background-image: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-background);
+    border: none;
+    padding: 18px 50px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+    letter-spacing: 1px;
+  }
+
+  .go-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 183, 0, 0.6);
+    opacity: 0.95;
+  }
+
+  /* ---------------- NUEVA SECCIÓN: SERVIDORES CONFIRMADOS ---------------- */
+  .confirmed-servers {
+      margin-top: 80px;
+      padding: 40px;
+      background: rgba(0, 150, 0, 0.1); /* Fondo verde oscuro sutil */
+      border-radius: 25px;
+      border: 1px solid var(--color-success);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+  }
+
+  .confirmed-servers h3 {
+      font-size: 28px;
+      color: var(--color-success);
+      text-shadow: 0 0 10px rgba(23, 185, 120, 0.5);
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-transform: uppercase;
+  }
+  
+  .update-time {
+      color: var(--color-secondary);
+      font-size: 14px;
+      margin-top: -20px;
+      margin-bottom: 30px;
+      font-weight: 600;
+  }
+
+  .server-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      text-align: left;
+  }
+
+  .confirmed-server-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      border-left: 5px solid var(--color-success);
+      transition: background 0.3s;
+  }
+
+  .confirmed-server-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+  }
+
+  .confirmed-server-item span {
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--color-light);
+      flex-grow: 1;
+  }
+  
+  .confirmed-server-item.used {
+      background: rgba(106, 106, 106, 0.1); /* Fondo más oscuro para usado */
+      border-left: 5px solid var(--color-used);
+  }
+
+  .confirmed-server-item.used span {
+      color: var(--color-used);
+      text-decoration: line-through;
+  }
+
+  .join-btn {
+      background-color: var(--color-success);
+      color: var(--color-background);
+      padding: 8px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s;
+  }
+
+  .join-btn:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+  }
+  
+  .join-btn.used {
+      background-color: var(--color-used);
+      cursor: not-allowed;
+  }
+  /* ---------------- FIN NUEVA SECCIÓN ---------------- */
+
+
+  /* Sección de Servidores en Vivo (Modificada) */
+  .live-servers {
+    margin-top: 80px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 25px;
+    padding: 40px;
+    border: 1px solid rgba(255, 183, 0, 0.2);
+    box-shadow: inset 0 0 10px rgba(255, 183, 0, 0.1);
+  }
+
+  .live-servers h3 {
+    font-size: 28px;
+    color: var(--color-primary);
+    text-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* Nuevo estilo para el mensaje de desarrollo */
+  .dev-message {
+    color: var(--color-secondary);
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 0;
   }
 </style>
 </head>
 <body>
 
-<div class="maintenance-container">
-  <h1>🚀 MÉTODO MOREIRA 💎</h1>
-  
-  <div class="loader"></div>
-
-  <h2>ACTUALIZANDO SERVIDORES ELITE</h2>
-  
-  <p>Estamos optimizando la conexión y añadiendo nuevos **Brainrots de Alto Rendimiento**.</p>
-  <p>Vuelve en unos momentos para acceder a la lista más exclusiva.</p>
+<div id="access-gate">
+    <div class="access-box">
+        <h2>🔒 ACCESO RESTRINGIDO ELITE</h2>
+        <p>Introduce tu llave de acceso premium para continuar.</p>
+        <input type="text" id="access-key-input" placeholder="Llave de Acceso">
+        <button class="access-btn" onclick="checkAccessKey()">Desbloquear Acceso</button>
+        <p id="error-message" style="display: none;">Llave incorrecta. Inténtalo de nuevo.</p>
+    </div>
 </div>
+<div id="main-content">
+  <div class="container">
+    <h1>🚀 MÉTODO MOREIRA 💎</h1>
+    <h2>PREMIUM ACCESS</h2>
+
+    <div class="confirmed-servers" id="confirmedServers">
+      <h3>✅ SERVIDORES CONFIRMADOS (BAJO RIESGO)</h3>
+      <p class="update-time">Última Actualización: 25 de octubre, 21:50 hrs</p>
+      <div id="serversListConfirmed" class="server-list-container">
+          <p class="dev-message" style="color: var(--color-success);">Cargando servidores...</p>
+      </div>
+    </div>
+    <p style="margin-top: 50px;">Selecciona tu **Brainrot de Alto Rendimiento** para activar la conexión *Elite*:</p>
+
+    <div class="brainrot-container" id="brainrots">
+      </div>
+
+    <button class="go-btn" onclick="goToRandomServer()">ACCESO INMEDIATO</button>
+
+    <div class="live-servers" id="liveServers">
+      <h3>🌐 SERVIDORES ELITE EN VIVO (BAJO PING)</h3>
+      <p class="dev-message">En Desarrollo...</p>
+    </div>
+  </div>
+</div>
+<script>
+  // 🔑 Llaves de acceso válidas
+  const VALID_KEYS = [
+    "18273-81271-193729",
+    "91271-18731-8183182",
+    "18271-18282-1827222",
+    "19282-28323-192288",
+    "19222-192811-1929192",
+    "56-56-56"
+  ].map(key => key.toLowerCase());
+
+  const accessGate = document.getElementById('access-gate');
+  const mainContent = document.getElementById('main-content');
+  const keyInput = document.getElementById('access-key-input');
+  const errorMessage = document.getElementById('error-message');
+
+  function checkAccessKey() {
+    const enteredKey = keyInput.value.trim().toLowerCase();
+
+    if (VALID_KEYS.includes(enteredKey)) {
+      accessGate.style.display = 'none';
+      mainContent.style.display = 'block';
+      document.body.style.overflow = 'auto'; 
+    } else {
+      errorMessage.style.display = 'block';
+      keyInput.value = '';
+      keyInput.focus();
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    keyInput.focus();
+    loadConfirmedServers(); // Cargar la nueva lista al inicio
+  });
+
+  keyInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+          checkAccessKey();
+      }
+  });
+
+
+  // ====================================================================
+  // 💥 SERVIDORES CONFIRMADOS (¡NUEVOS LINKS Y FUNCIÓN DE MEMORIA!)
+  // ====================================================================
+
+  const CONFIRMED_SERVERS = [
+      // Server 1
+      { 
+        name: "Quesadilla cocodrila 9M/S | Burrito Motorito 28M/S | Pot Hotspot 12M/S", 
+        url: "https://www.roblox.com/share?code=5a2478302a18f048b499d9538644c451&type=Server",
+        id: "server-5a247830" // ID único basado en el código para localStorage
+      },
+      // Server 2
+      { 
+        name: "TRADE MY LOS MOBILIS CANDY 194M", 
+        url: "https://www.roblox.com/share?code=d4307e59b9e8e64c9d45d9c69c28aaad&type=Server",
+        id: "server-d4307e59"
+      },
+      // Server 3
+      { 
+        name: "All the brainrots from the Halloween update", 
+        url: "https://www.roblox.com/share?code=63154d96832fda4984c930f57d4c2e1c&type=Server",
+        id: "server-63154d96"
+      },
+      // Server 4
+      { 
+        name: "Zombie tralala 5.5M/S", 
+        url: "https://www.roblox.com/share?code=fdac4206777266448bb48c45de47e3df&type=Server",
+        id: "server-fdac4206"
+      },
+  ];
+
+  // Función para marcar un servidor como usado
+  function markServerAsUsed(serverId) {
+      // Obtener la lista de usados, o un array vacío si no existe
+      let usedServers = JSON.parse(localStorage.getItem('usedConfirmedServers')) || [];
+      
+      if (!usedServers.includes(serverId)) {
+          usedServers.push(serverId);
+          localStorage.setItem('usedConfirmedServers', JSON.stringify(usedServers));
+          loadConfirmedServers(); // Vuelve a cargar la lista para actualizar la vista
+      }
+  }
+
+  function loadConfirmedServers() {
+      const listContainer = document.getElementById('serversListConfirmed');
+      listContainer.innerHTML = ''; // Limpia el contenido
+
+      // Obtener la lista de servidores que ya fueron usados
+      const usedServers = JSON.parse(localStorage.getItem('usedConfirmedServers')) || [];
+
+      // Filtra solo los servidores que NO han sido usados
+      const availableServers = CONFIRMED_SERVERS.filter(server => !usedServers.includes(server.id));
+
+      if (availableServers.length === 0) {
+          listContainer.innerHTML = '<p class="dev-message" style="color: var(--color-used);">¡Has agotado todos los enlaces confirmados! Espera la próxima actualización.</p>';
+          return;
+      }
+
+      availableServers.forEach(server => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'confirmed-server-item';
+          
+          // Crear el botón de unión
+          const joinBtn = document.createElement('a');
+          joinBtn.href = server.url;
+          joinBtn.target = "_blank";
+          joinBtn.className = 'join-btn';
+          joinBtn.textContent = 'UNIRSE 🚀';
+          
+          // Añadir el listener para marcar como usado al hacer clic
+          joinBtn.addEventListener('click', () => {
+              markServerAsUsed(server.id);
+          });
+          
+          itemDiv.innerHTML = `<span>${server.name}</span>`;
+          itemDiv.appendChild(joinBtn);
+          listContainer.appendChild(itemDiv);
+      });
+  }
+
+
+  // ====================================================================
+  // 🎲 SERVERS ALEATORIOS (RANDOMIZER) - NO SON LOS CONFIRMADOS
+  // ====================================================================
+
+  // 🔹 Lista de servidores (La lista completa que se usará para el botón "ACCESO INMEDIATO")
+  const servers = [
+    "https://www.roblox.com/share?code=7e14473f9162404f888bf83f8500b0cd&type=Server",
+    "https://www.roblox.com/share?code=e72669b8fb2ba946945f0a4e86d160be&type=Server",
+    "https://www.roblox.com/share?code=c134f89e57b3c448b16527e3b1c5aa0b&type=Server",
+    "https://www.roblox.com/share?code=a1f7426735e6c843b48d72bf78d1503c&type=Server",
+    "https://www.roblox.com/share?code=fc040e17a5cb634196d95b038fc2c3cb&type=Server",
+    "https://www.roblox.com/share?code=95e73b47bd0c0545a62f4b51c2d8e933&type=Server",
+    "https://www.roblox.com/share?code=507f11d723e2ab44923c98a179933558&type=Server",
+    "https://www.roblox.com/share?code=280ceb6baad96d46924c97db4f4af0fd&type=Server",
+    "https://www.roblox.com/share?code=9ebee10510fbd74e94d66ad4e789d7eb&type=Server",
+    "https://www.roblox.com/share?code=3c39338915c1df4cac8097aa8a5bbc3f&type=Server",
+    "https://www.roblox.com/share?code=59e5cec5fdba6f4f954db046295a452a&type=Server",
+    "https://www.roblox.com/share?code=a99f51cfa793dc48a0279d290f0410bf&type=Server",
+  ];
+
+  // 🔹 Brainrots (Nombres simplificados para el randomizer)
+  const brainrots = [
+    { name: "Los Bros", img: "./img/bros.png", min: [8, 15] },
+    { name: "Las Sis", img: "./img/las_sis.png", min: [10, 20] },
+    { name: "Celularsini", img: "./img/celularsini.png", min: [12, 25] },
+    { name: "Garama & Mandundung", img: "./img/garamadundung.png", min: [15, 28] },
+    { name: "Spaghetti Tualetti", img: "./img/spaghettitualetti.png", min: [17, 30] },
+    { name: "Secret Combinación", img: "./img/secretcombinacion.png", min: [20, 32] },
+    { name: "Dragon Cannelloni", img: "./img/dragoncanneloni.png", min: [25, 35] },
+    { name: "Burguru & Fryuru", img: "./img/burgurufryuru.png", min: [23, 33] }
+  ];
+
+  const container = document.getElementById("brainrots");
+
+  brainrots.forEach(b => {
+    const randomTime = Math.floor(Math.random() * (b.min[1] - b.min[0] + 1)) + b.min[0];
+    const div = document.createElement("div");
+    div.classList.add("brainrot");
+    // NOTA: Asegúrate de tener las imágenes en una carpeta 'img/' o actualiza las rutas
+    div.innerHTML = `<img src="${b.img}"><span>${b.name}</span><p class="time">⚡ ${randomTime} min</p>`;
+    div.onclick = () => selectBrainrot(div);
+    container.appendChild(div);
+  });
+
+  let selectedBrainrot = null;
+  function selectBrainrot(element) {
+    document.querySelectorAll('.brainrot').forEach(e => e.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedBrainrot = element.innerText;
+  }
+
+  function goToRandomServer() {
+    if (!selectedBrainrot) {
+      alert("Primero elige un Brainrot de Alto Rendimiento 👑");
+      return;
+    }
+    const randomLink = servers[Math.floor(Math.random() * servers.length)];
+    window.open(randomLink, "_blank");
+  }
+  
+</script>
 
 </body>
 </html>
