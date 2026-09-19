@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSG Predictor Pro 2.2 | Advanced Analytics</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&family=Space+Grotesk:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --surface: rgba(20, 22, 30, 0.7);
+            --surface-hover: rgba(30, 33, 45, 0.9);
+            --primary: #00e5ff;
+            --primary-glow: rgba(0, 229, 255, 0.4);
+            --secondary: #7000ff;
+            --purple: #b06cff;
+            --purple-glow: rgba(176, 108, 255, 0.35);
+            --accent: #ff0055;
+            --text: #ffffff;
+            --text-dim: #8b92a5;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #00ff88;
+            --warning: #ffcc00;
+            --danger: #ff3366;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.15), transparent 25%);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header { text-align: center; margin-bottom: 30px; }
+
+        header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        header p { color: var(--text-dim); font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* PRESETS Y QOL BAR */
+        .qol-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .preset-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .preset-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary-glow); }
+
+        /* TEAMS GRID */
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .team-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .team-card.home::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background: linear-gradient(90deg, var(--primary), transparent); }
+        .team-card.away::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background: linear-gradient(90deg, var(--accent), transparent); }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .input-group label { font-size: 0.85rem; color: var(--text-dim); font-weight: 500; }
+        
+        .input-group input {
+            width: 75px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .input-group input[type="text"] { width: 100%; text-align: left; }
+        .input-group input:focus { border-color: var(--primary); }
+
+        /* CONTROLES */
+        .controls { text-align: center; margin-bottom: 40px; }
+
+        .btn-glow {
+            font-family: 'Space Grotesk', sans-serif;
+            background: transparent;
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 16px 45px;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .btn-glow:hover { background: var(--primary); color: #000; box-shadow: 0 0 40px var(--primary-glow); transform: scale(1.03); }
+
+        /* PROGRESS BAR */
+        .progress-container { display: none; max-width: 600px; margin: 25px auto 0; text-align: center; }
+        .progress-text { font-family: 'Space Grotesk'; font-size: 1rem; color: var(--primary); margin-bottom: 8px; }
+        .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--secondary), var(--primary), var(--success)); transition: width 0.2s ease; }
+
+        /* RESULTADOS GRID */
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; display: none; }
+        .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+        .result-card h3 { font-family: 'Space Grotesk'; color: var(--text); margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        /* Tarjeta Destacada */
+        .best-bets-card {
+            grid-column: 1 / -1; 
+            background: linear-gradient(145deg, rgba(20,22,30,0.95), rgba(0,229,255,0.05)); 
+            border: 1px solid var(--primary); 
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.1);
+        }
+
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; align-items: center;}
+        .stat-row span { color: var(--text-dim); }
+        .stat-row strong { font-family: 'Space Grotesk'; color: #fff; }
+
+        .ev-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .ev-positive { background: rgba(0, 255, 136, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .ev-negative { background: rgba(255, 51, 102, 0.2); color: var(--danger); }
+        .fair-odds-badge { background: rgba(255, 204, 0, 0.15); color: var(--warning); padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid var(--warning); margin-left:10px; font-family: 'Space Grotesk';}
+
+        .ou-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; text-align: center; }
+        .ou-header { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+        .ou-cell { background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; }
+        .ou-cell span { display: block; font-size: 0.8rem; color: var(--text-dim); }
+        .ou-cell strong { font-family: 'Space Grotesk'; font-size: 1rem; color: var(--success); }
+        .ou-cell.under strong { color: var(--accent); }
+
+        /* MAPA DE CALOR (2.0) */
+        .heat-grid { display: grid; gap: 3px; font-family: 'Space Grotesk', sans-serif; }
+        .heat-cell { aspect-ratio: 1; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:0.7rem; font-weight:700; color:#fff; min-width:38px; transition: transform 0.15s ease; }
+        .heat-cell:hover { transform: scale(1.08); }
+        .heat-label { display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:var(--text-dim); font-weight:600; }
+        .heat-best { box-shadow: 0 0 0 2px var(--warning) inset; }
+
+        .picks-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    </style>
+<body>
+
+<div class="container">
+    <header>
+        <h1>RSG Predictor Pro <span style="font-size:1.5rem; -webkit-text-fill-color: var(--warning); vertical-align:middle;">2.2</span></h1>
+        <p>Motor de Inferencia Estadística • Modelo Dixon-Coles Bivariado</p>
+        <p style="margin-top:10px; font-size:0.8rem; color:var(--text-dim); letter-spacing:0.5px;">✨ Nuevo: 📊 xGA y Splits Local/Visita &nbsp;•&nbsp; 🎲 Ajuste por Tamaño de Muestra &nbsp;•&nbsp; 💜 Picks de Élite (80%+)</p>
+    </header>
+
+    <div class="qol-bar">
+        <div>
+            <span style="font-size:0.85rem; color:var(--text-dim); margin-right:10px;">Cargar Partidos Top:</span>
+            <button class="preset-btn" onclick="loadPreset('clasico')"> Real Madrid vs Barcelona</button>
+            <button class="preset-btn" onclick="loadPreset('derby')"> Man City vs Arsenal</button>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button class="preset-btn" style="border-color:var(--primary)" onclick="saveMatch()">💾 Guardar Partido</button>
+            <select id="savedMatches" style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid var(--border); padding:8px 12px; border-radius:20px; font-size:0.85rem;">
+                <option value="">🗂️ Partidos guardados…</option>
+            </select>
+            <button class="preset-btn" onclick="loadSavedMatch()">📂 Cargar</button>
+            <button class="preset-btn" style="border-color:var(--danger); color:var(--danger);" onclick="deleteSavedMatch()">🗑️</button>
+        </div>
+    </div>
+
+    <!-- CARGA RÁPIDA -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; margin-bottom:30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+            <span style="font-size:0.9rem; font-weight:700; color:var(--text);">⚡ Carga Rápida</span>
+            <button class="preset-btn" id="quickLoadBtn" style="border-color:var(--primary);" onclick="quickLoadBoth()">⚡ Cargar Ambos Equipos</button>
+        </div>
+        <textarea id="quickLoadArea" rows="2" placeholder="Real Madrid, 1.85, 2.10, 0.85, 2.40, 0.60, 8.5, 6, 0, 6.2, 3.8&#10;Barcelona, 1.70, 1.95, 1.10, 1.60, 1.30, 7.5, 3, 15, 5.8, 4.2" style="width:100%; background:rgba(0,0,0,0.4); border:1px solid var(--border); color:#fff; padding:10px 12px; border-radius:8px; font-family:'Space Grotesk', monospace; font-size:0.82rem; resize:vertical; outline:none;"></textarea>
+        <div style="font-size:0.72rem; color:var(--text-dim); margin-top:8px;">Una línea por equipo (Local primero): <b style="color:var(--text);">Nombre, xG, GF, GC, GF(Últ.5), GC(Últ.5), Forma, Descanso, Bajas%, CF, CC</b> — separados por coma.</div>
+    </div>
+
+    <div class="teams-grid">
+        <!-- LOCAL -->
+        <div class="team-card home">
+            <div class="input-group" style="margin-bottom:15px;">
+                <input type="text" id="hName" value="Real Madrid" style="font-size:1.3rem; color: var(--primary);">
+            </div>
+            <div class="input-group"><label>xG Promedio:</label><input type="number" id="hXG" step="0.1" value="1.85"></div>
+            <div class="input-group"><label title="Goles esperados EN CONTRA por partido. Mide la calidad de las chances que concede, sin el ruido de la suerte o del portero. Dejá 0 si no lo tenés.">xGA (xG en contra):</label><input type="number" id="hXGA" step="0.1" value="0.95"></div>
+            <div class="input-group"><label>Goles Anotados (Prom):</label><input type="number" id="hGF" step="0.1" value="2.10"></div>
+            <div class="input-group"><label>Goles Recibidos (Prom):</label><input type="number" id="hGC" step="0.1" value="0.85"></div>
+            <div class="input-group"><label title="Promedio de goles anotados por partido en los últimos 5">📈 Anotados Últimos 5:</label><input type="number" id="hGF5" step="0.1" value="2.40"></div>
+            <div class="input-group"><label title="Promedio de goles recibidos por partido en los últimos 5">📈 Recibidos Últimos 5:</label><input type="number" id="hGC5" step="0.1" value="0.60"></div>
+            <div class="input-group"><label title="Goles anotados por partido JUGANDO DE LOCAL. Los equipos rinden distinto en casa que fuera; esto lo captura. Dejá 0 si no lo tenés.">🏟️ Anotados de Local:</label><input type="number" id="hGFCond" step="0.1" value="2.45"></div>
+            <div class="input-group"><label title="Goles recibidos por partido JUGANDO DE LOCAL. Dejá 0 si no lo tenés.">🏟️ Recibidos de Local:</label><input type="number" id="hGCCond" step="0.1" value="0.70"></div>
+            <div class="input-group"><label title="Partidos jugados en la muestra. Con pocos partidos los promedios son ruido, así que el modelo los acerca al promedio de la liga. Dejá 0 para desactivar el ajuste.">📊 Partidos Jugados:</label><input type="number" id="hMP" step="1" min="0" value="20"></div>
+            <div class="input-group"><label>Forma Actual (1-10):</label><input type="number" id="hForm" min="1" max="10" step="0.5" value="8.5"></div>
+            <div class="input-group"><label>Días de Descanso:</label><input type="number" id="hRest" value="6"></div>
+            <div class="input-group"><label>Bajas Clave (% Plantilla):</label><input type="number" id="hInjuries" value="0" min="0" max="50"></div>
+            <div class="input-group"><label>Córners Favor / Contra:</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" id="hCF" step="0.1" value="6.2" style="width:45px;">
+                    <input type="number" id="hCC" step="0.1" value="3.8" style="width:45px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- VISITANTE -->
+        <div class="team-card away">
+            <div class="input-group" style="margin-bottom:15px;">
+                <input type="text" id="aName" value="Barcelona" style="font-size:1.3rem; color: var(--accent);">
+            </div>
+            <div class="input-group"><label>xG Promedio:</label><input type="number" id="aXG" step="0.1" value="1.70"></div>
+            <div class="input-group"><label title="Goles esperados EN CONTRA por partido. Mide la calidad de las chances que concede, sin el ruido de la suerte o del portero. Dejá 0 si no lo tenés.">xGA (xG en contra):</label><input type="number" id="aXGA" step="0.1" value="1.20"></div>
+            <div class="input-group"><label>Goles Anotados (Prom):</label><input type="number" id="aGF" step="0.1" value="1.95"></div>
+            <div class="input-group"><label>Goles Recibidos (Prom):</label><input type="number" id="aGC" step="0.1" value="1.10"></div>
+            <div class="input-group"><label title="Promedio de goles anotados por partido en los últimos 5">📈 Anotados Últimos 5:</label><input type="number" id="aGF5" step="0.1" value="1.60"></div>
+            <div class="input-group"><label title="Promedio de goles recibidos por partido en los últimos 5">📈 Recibidos Últimos 5:</label><input type="number" id="aGC5" step="0.1" value="1.30"></div>
+            <div class="input-group"><label title="Goles anotados por partido JUGANDO DE VISITANTE. Los equipos rinden distinto fuera de casa; esto lo captura. Dejá 0 si no lo tenés.">✈️ Anotados de Visita:</label><input type="number" id="aGFCond" step="0.1" value="1.70"></div>
+            <div class="input-group"><label title="Goles recibidos por partido JUGANDO DE VISITANTE. Dejá 0 si no lo tenés.">✈️ Recibidos de Visita:</label><input type="number" id="aGCCond" step="0.1" value="1.35"></div>
+            <div class="input-group"><label title="Partidos jugados en la muestra. Con pocos partidos los promedios son ruido, así que el modelo los acerca al promedio de la liga. Dejá 0 para desactivar el ajuste.">📊 Partidos Jugados:</label><input type="number" id="aMP" step="1" min="0" value="20"></div>
+            <div class="input-group"><label>Forma Actual (1-10):</label><input type="number" id="aForm" min="1" max="10" step="0.5" value="7.5"></div>
+            <div class="input-group"><label>Días de Descanso:</label><input type="number" id="aRest" value="3"></div>
+            <div class="input-group"><label>Bajas Clave (% Plantilla):</label><input type="number" id="aInjuries" value="15" min="0" max="50"></div>
+            <div class="input-group"><label>Córners Favor / Contra:</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" id="aCF" step="0.1" value="5.8" style="width:45px;">
+                    <input type="number" id="aCC" step="0.1" value="4.2" style="width:45px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AJUSTES DE CONTEXTO -->
+    <div style="background:var(--surface); padding:15px 25px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.9rem; color:var(--text-dim);">🌍 Promedio de Goles de la Liga:</span>
+            <input type="number" id="leagueAvg" step="0.05" value="1.35" style="width:80px; background:#000; border:1px solid var(--border); color:#fff; padding:5px; border-radius:6px; text-align:center; font-weight:bold;">
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.9rem; color:var(--text-dim);" title="Compensa el sesgo de anotar como local. La media histórica ronda 1.10-1.30 según la liga.">🏟️ Ventaja de Localía:</span>
+            <input type="number" id="homeAdv" step="0.01" min="1" max="1.5" value="1.15" style="width:80px; background:#000; border:1px solid var(--border); color:#fff; padding:5px; border-radius:6px; text-align:center; font-weight:bold;">
+        </div>
+    </div>
+
+    <div style="background:var(--surface); padding:15px 25px; border-radius:12px; border:1px solid var(--border); margin-bottom:30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.9rem; color:var(--text-dim);" title="Cuánto pesan los últimos 5 partidos frente al promedio de temporada.">📈 Peso Forma Reciente:</span>
+            <input type="number" id="formWeight" step="5" min="0" max="100" value="50" style="width:70px; background:#000; border:1px solid var(--border); color:#fff; padding:5px; border-radius:6px; text-align:center; font-weight:bold;"> %
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.9rem; color:var(--text-dim);" title="Partidos decisivos suelen jugarse con más cautela; los de trámite tienden a ser más abiertos.">🎯 Contexto:</span>
+            <select id="matchContext" style="background:#000; border:1px solid var(--border); color:#fff; padding:6px 10px; border-radius:6px; font-weight:bold;">
+                <option value="normal" selected>Normal</option>
+                <option value="decisive">Decisivo / Alta Presión</option>
+                <option value="deadrubber">Sin Nada en Juego</option>
+            </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.9rem; color:var(--text-dim);" title="Solo se usa para sugerirte tamaño de apuesta (Kelly). Es 100% local.">💰 Bankroll:</span>
+            <input type="number" id="bankroll" step="50" min="0" value="1000" style="width:80px; background:#000; border:1px solid var(--border); color:#fff; padding:5px; border-radius:6px; text-align:center; font-weight:bold;">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="btnSimulate" class="btn-glow" onclick="runModel()">CALCULAR PROBABILIDADES</button>
+        <div class="progress-container" id="progressWrap">
+            <div class="progress-text" id="progressText">Inicializando... [0%]</div>
+            <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+    </div>
+
+    <!-- PANEL DE RESULTADOS -->
+    <div class="results-grid" id="resultsGrid">
+
+        <!-- DIAGNÓSTICO -->
+        <div class="result-card" id="diagCard" style="grid-column: 1 / -1;">
+            <h3>🩺 Diagnóstico del Modelo</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 15px;">
+                Revisa si los datos que cargaste producen proyecciones realistas. Un modelo con datos malos da probabilidades malas con total confianza — esto te avisa antes de que apuestes sobre basura.
+            </p>
+            <div id="diagList"></div>
+        </div>
+
+        <!-- PICKS -->
+        <div class="result-card best-bets-card">
+            <h3>🏆 Picks Inteligentes</h3>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 20px;">
+                Organizados por categoría y ordenados de mayor a menor probabilidad. Todas las probabilidades son <strong>exactas</strong> (calculadas de la matriz Dixon-Coles, sin error de muestreo). Si cargaste una cuota, ves el <strong>EV real</strong>; si no, la <strong>Cuota Justa</strong>. Kelly es una sugerencia matemática, no una garantía.
+            </p>
+
+            <div style="margin-bottom:22px;">
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">⚽ Goles</h4>
+                <div id="picksGoles" class="picks-row"></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">🚩 Tiros de Esquina</h4>
+                <div id="picksCorners" class="picks-row"></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">🏆 Ganador o Doble Oportunidad</h4>
+                <div id="picksGanador" class="picks-row"></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">👥 Goles por Equipo</h4>
+                <div id="picksEquipos" class="picks-row"></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">🎚️ Hándicap</h4>
+                <div id="picksHandicap" class="picks-row"></div>
+            </div>
+            <div>
+                <h4 style="font-size:0.95rem; color:var(--text); margin:0 0 10px 0;">✨ Picks Extra</h4>
+                <div id="picksExtra" class="picks-row"></div>
+            </div>
+        </div>
+
+        <!-- MODELO VS MERCADO -->
+        <div class="result-card" style="grid-column: 1 / -1;">
+            <h3>💹 Modelo vs Mercado</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 15px;">
+                Le quita el margen de la casa (<em>vig</em>) a las cuotas 1X2 que cargaste y compara la probabilidad real del mercado contra la del modelo. Donde más te separás del mercado es donde está tu ventaja — o tu error.
+            </p>
+            <div id="marketCompare"></div>
+        </div>
+
+        <!-- 1X2 -->
+        <div class="result-card">
+            <h3>📊 1X2 & Doble Oportunidad</h3>
+            <div class="stat-row">
+                <span>Victoria Local (1): <strong id="res1" style="color:var(--primary)">--%</strong></span>
+                <div><input type="number" id="odds1" step="0.01" value="2.10" oninput="refreshOdds()" style="width:50px; background:#000; color:#fff; border:1px solid var(--border); text-align:center;"> <span id="ev1" class="ev-badge">--</span></div>
+            </div>
+            <div class="stat-row">
+                <span>Empate (X): <strong id="resX">--%</strong></span>
+                <div><input type="number" id="oddsX" step="0.01" value="3.50" oninput="refreshOdds()" style="width:50px; background:#000; color:#fff; border:1px solid var(--border); text-align:center;"> <span id="evX" class="ev-badge">--</span></div>
+            </div>
+            <div class="stat-row">
+                <span>Victoria Visita (2): <strong id="res2" style="color:var(--accent)">--%</strong></span>
+                <div><input type="number" id="odds2" step="0.01" value="3.20" oninput="refreshOdds()" style="width:50px; background:#000; color:#fff; border:1px solid var(--border); text-align:center;"> <span id="ev2" class="ev-badge">--</span></div>
+            </div>
+            <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--text-dim); text-transform:uppercase;">Doble Oportunidad</h4>
+                <div class="stat-row"><span>1X (Local o Empate):</span> <strong id="res1X" style="color:var(--primary)">--%</strong></div>
+                <div class="stat-row"><span>X2 (Visita o Empate):</span> <strong id="resX2" style="color:var(--accent)">--%</strong></div>
+                <div class="stat-row"><span>12 (Cualquiera Gana):</span> <strong id="res12">--%</strong></div>
+            </div>
+        </div>
+
+        <!-- GOLES -->
+        <div class="result-card">
+            <h3>⚽ Líneas de Goles</h3>
+            <div class="ou-grid">
+                <div class="ou-header">OVER</div><div class="ou-header">UNDER</div>
+                <div class="ou-cell"><span>+0.5</span><strong id="o05">--%</strong></div><div class="ou-cell under"><span>-0.5</span><strong id="u05">--%</strong></div>
+                <div class="ou-cell"><span>+1.5</span><strong id="o15">--%</strong></div><div class="ou-cell under"><span>-1.5</span><strong id="u15">--%</strong></div>
+                <div class="ou-cell"><span>+2.5</span><strong id="o25">--%</strong></div><div class="ou-cell under"><span>-2.5</span><strong id="u25">--%</strong></div>
+                <div class="ou-cell"><span>+3.5</span><strong id="o35">--%</strong></div><div class="ou-cell under"><span>-3.5</span><strong id="u35">--%</strong></div>
+                <div class="ou-cell"><span>+4.5</span><strong id="o45">--%</strong></div><div class="ou-cell under"><span>-4.5</span><strong id="u45">--%</strong></div>
+            </div>
+            <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                <h4 style="margin:0 0 10px 0; font-size:0.85rem; color:var(--text-dim); text-transform:uppercase;">Cuotas (opcional)</h4>
+                <div class="stat-row">
+                    <span>Más de 2.5: <strong id="o25b" style="color:var(--success)">--%</strong></span>
+                    <div><input type="number" id="oddsO25" step="0.01" value="1.90" oninput="refreshOdds()" style="width:50px; background:#000; color:#fff; border:1px solid var(--border); text-align:center;"> <span id="evO25" class="ev-badge">--</span></div>
+                </div>
+                <div class="stat-row">
+                    <span>Ambos Anotan: <strong id="resBtts" style="color:var(--success)">--%</strong></span>
+                    <div><input type="number" id="oddsBTTS" step="0.01" value="1.85" oninput="refreshOdds()" style="width:50px; background:#000; color:#fff; border:1px solid var(--border); text-align:center;"> <span id="evBTTS" class="ev-badge">--</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CÓRNERS -->
+        <div class="result-card">
+            <h3>🚩 Córners Proyectados</h3>
+            <div class="stat-row" style="margin-bottom:10px;"><span>Total Esperado:</span> <strong id="resCT" style="color:var(--primary)">--</strong></div>
+            <div class="ou-grid">
+                <div class="ou-header">OVER</div><div class="ou-header">UNDER</div>
+                <div class="ou-cell"><span>+7.5</span><strong id="co75">--%</strong></div><div class="ou-cell under"><span>-7.5</span><strong id="cu75">--%</strong></div>
+                <div class="ou-cell"><span>+8.5</span><strong id="co85">--%</strong></div><div class="ou-cell under"><span>-8.5</span><strong id="cu85">--%</strong></div>
+                <div class="ou-cell"><span>+9.5</span><strong id="co95">--%</strong></div><div class="ou-cell under"><span>-9.5</span><strong id="cu95">--%</strong></div>
+                <div class="ou-cell"><span>+10.5</span><strong id="co105">--%</strong></div><div class="ou-cell under"><span>-10.5</span><strong id="cu105">--%</strong></div>
+                <div class="ou-cell"><span>+11.5</span><strong id="co115">--%</strong></div><div class="ou-cell under"><span>-11.5</span><strong id="cu115">--%</strong></div>
+            </div>
+        </div>
+
+        <!-- MARCADORES -->
+        <div class="result-card">
+            <h3>🎯 Top 6 Marcadores Exactos</h3>
+            <div id="exactScores"></div>
+        </div>
+
+        <!-- RADAR -->
+        <div class="result-card">
+            <h3>🕸️ Radar Comparativo</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 10px;">
+                Foto visual de los datos cargados (no es una probabilidad del modelo).
+            </p>
+            <div id="radarChart" style="display:flex; justify-content:center; flex-direction:column; align-items:center;"></div>
+        </div>
+
+        <!-- MAPA DE CALOR -->
+        <div class="result-card" style="grid-column: 1 / -1;">
+            <h3>🔥 Mapa de Calor de Marcadores</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 15px;">
+                Probabilidad exacta de cada resultado (0-5 goles por lado, más el bucket 6+).
+            </p>
+            <div id="scoreHeatmap" style="overflow-x:auto;"></div>
+        </div>
+
+        <!-- PARTIDO COMPLETO -->
+        <div class="result-card" style="grid-column: 1 / -1;">
+            <h3>🎬 Partido Completo</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 15px;">
+                Arma el relato del partido usando el marcador y los córners de <strong>mayor probabilidad</strong> del modelo — como la ficha de un partido ya terminado.
+            </p>
+            <div style="text-align:center; margin-bottom:18px;">
+                <button class="preset-btn" style="border-color:var(--primary); padding:10px 26px; font-size:0.95rem;" onclick="renderFullMatch()">🎬 Ver Partido Completo</button>
+            </div>
+            <div id="fullMatchReport"></div>
+        </div>
+
+        <!-- HÁNDICAP ASIÁTICO -->
+        <div class="result-card" style="grid-column: 1 / -1;">
+            <h3>🎚️ Hándicap Asiático</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: -5px; margin-bottom: 15px;">
+                Probabilidad exacta de cobertura por línea. Las líneas enteras pueden empujar (push = reembolso); las .5 nunca empujan.
+            </p>
+            <div id="ahTable" style="overflow-x:auto;"></div>
+        </div>
+
+    </div>
+</div>
+<script>
+    // =====================================================================
+    //  NÚCLEO PROBABILÍSTICO — Dixon-Coles con cálculo EXACTO (sin Monte Carlo)
+    // =====================================================================
+    // Antes las probabilidades salían de muestrear 50.000 partidos al azar, lo que
+    // introducía un error de muestreo de ±0,5 puntos. Como ya construíamos la matriz
+    // de probabilidad conjunta exacta para poder muestrear, el muestreo era un paso
+    // intermedio que SOLO agregaba ruido: ahora sumamos la matriz directamente y las
+    // probabilidades son exactas (error 0). Es también órdenes de magnitud más rápido.
+
+    const MAX_GOALS = 12;   // cubre >99,99% de la masa en lambdas realistas
+    const DC_RHO = -0.13;   // correlación Dixon-Coles en marcadores bajos
+
+    function logFactorial(n) {
+        let sum = 0;
+        for (let i = 2; i <= n; i++) sum += Math.log(i);
+        return sum;
+    }
+
+    function poissonPMF(k, lambda) {
+        if (lambda <= 0) return k === 0 ? 1 : 0;
+        return Math.exp(-lambda + k * Math.log(lambda) - logFactorial(k));
+    }
+
+    function dixonColesTau(x, y, lambda, mu, rho) {
+        if (x === 0 && y === 0) return 1 - (lambda * mu * rho);
+        if (x === 1 && y === 0) return 1 + (mu * rho);
+        if (x === 0 && y === 1) return 1 + (lambda * rho);
+        if (x === 1 && y === 1) return 1 - rho;
+        return 1.0;
+    }
+
+    function buildScoreMatrix(lambdaHome, lambdaAway, rho = DC_RHO, maxGoals = MAX_GOALS) {
+        const matrix = [];
+        let total = 0;
+        for (let x = 0; x <= maxGoals; x++) {
+            const row = [];
+            for (let y = 0; y <= maxGoals; y++) {
+                const p = poissonPMF(x, lambdaHome) * poissonPMF(y, lambdaAway) *
+                          dixonColesTau(x, y, lambdaHome, lambdaAway, rho);
+                total += p;
+                row.push(p);
+            }
+            matrix.push(row);
+        }
+        for (let x = 0; x <= maxGoals; x++)
+            for (let y = 0; y <= maxGoals; y++)
+                matrix[x][y] /= total;   // normaliza la masa truncada
+        return matrix;
+    }
+
+    // Recorre la matriz UNA vez y deriva todos los mercados de forma exacta.
+    function computeMarkets(matrix, lambdaCornTotal) {
+        const M = matrix.length;
+        const m = {
+            p1: 0, pX: 0, p2: 0, btts: 0,
+            totalGoals: new Array(2 * M).fill(0),
+            homeGoals: new Array(M).fill(0),
+            awayGoals: new Array(M).fill(0),
+            margin: {},            // (goles local - goles visita) -> probabilidad
+            scores: [],
+            homeCleanSheet: 0, awayCleanSheet: 0,
+            homeWinToNil: 0, awayWinToNil: 0,
+            homeBy2plus: 0, awayBy2plus: 0,
+        };
+
+        for (let x = 0; x < M; x++) {
+            for (let y = 0; y < M; y++) {
+                const p = matrix[x][y];
+                if (p <= 0) continue;
+                const diff = x - y;
+
+                if (diff > 0) m.p1 += p; else if (diff === 0) m.pX += p; else m.p2 += p;
+                if (x > 0 && y > 0) m.btts += p;
+                if (y === 0) m.homeCleanSheet += p;
+                if (x === 0) m.awayCleanSheet += p;
+                if (diff > 0 && y === 0) m.homeWinToNil += p;
+                if (diff < 0 && x === 0) m.awayWinToNil += p;
+                if (diff >= 2) m.homeBy2plus += p;
+                if (diff <= -2) m.awayBy2plus += p;
+
+                m.totalGoals[x + y] += p;
+                m.homeGoals[x] += p;
+                m.awayGoals[y] += p;
+                m.margin[diff] = (m.margin[diff] || 0) + p;
+                m.scores.push({ x, y, p });
+            }
+        }
+
+        m.p1X = m.p1 + m.pX;
+        m.pX2 = m.p2 + m.pX;
+        m.p12 = m.p1 + m.p2;
+
+        const overFrom = (arr) => (line) => {
+            let s = 0;
+            for (let k = Math.ceil(line); k < arr.length; k++) s += arr[k];
+            return s;
+        };
+        m.goalsOver = overFrom(m.totalGoals);
+        m.homeOver  = overFrom(m.homeGoals);
+        m.awayOver  = overFrom(m.awayGoals);
+
+        // Córners: la suma de dos Poisson independientes es Poisson(λH+λA),
+        // así que también se calcula de forma exacta en vez de simularse.
+        m.cornersOver = (line) => {
+            let cdf = 0;
+            for (let k = 0; k <= Math.floor(line); k++) cdf += poissonPMF(k, lambdaCornTotal);
+            return 1 - cdf;
+        };
+
+        // Hándicap asiático exacto: gana si (diff + línea) > 0, empuja si == 0.
+        m.handicap = (line) => {
+            let win = 0, push = 0;
+            for (const d in m.margin) {
+                const adj = Number(d) + line;
+                if (adj > 0) win += m.margin[d];
+                else if (adj === 0) push += m.margin[d];
+            }
+            return { win, push };
+        };
+
+        m.scores.sort((a, b) => b.p - a.p);
+        return m;
+    }
+
+    // =====================================================================
+    //  CÁLCULO DE LAMBDAS
+    // =====================================================================
+    // Fuerza del prior para el encogimiento bayesiano: equivale a "6 partidos de
+    // equipo promedio" ya observados. Con 3 partidos jugados el promedio de un equipo
+    // es casi puro ruido, así que se lo acerca fuerte a la media de la liga; con 30
+    // partidos la muestra manda y el prior casi no pesa.
+    const K_PRIOR = 6;
+
+    function calculateLambdas() {
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const leagueAvg = val('leagueAvg') || 1.35;
+        const homeAdvantage = parseFloat(document.getElementById('homeAdv').value) || 1.15;
+        const formWeight = Math.min(Math.max(val('formWeight') / 100, 0), 1);
+        const matchContext = document.getElementById('matchContext').value;
+
+        const blend = (season, recent, w) => season * (1 - w) + recent * w;
+        // Promedia solo las fuentes realmente cargadas (0 = "no tengo ese dato")
+        const meanOf = (arr) => {
+            const v = arr.filter(x => x > 0);
+            return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
+        };
+        // Encogimiento hacia la media de la liga según tamaño de muestra
+        const shrink = (observed, n) => {
+            if (!n || n <= 0) return observed;          // 0 partidos = ajuste desactivado
+            return (n * observed + K_PRIOR * leagueAvg) / (n + K_PRIOR);
+        };
+
+        const side = (p) => ({
+            xG: val(p + 'XG'), xGA: val(p + 'XGA'),
+            gf: blend(val(p + 'GF'), val(p + 'GF5'), formWeight),
+            gc: blend(val(p + 'GC'), val(p + 'GC5'), formWeight),
+            gfCond: val(p + 'GFCond'), gcCond: val(p + 'GCCond'),
+            mp: val(p + 'MP'),
+            form: val(p + 'Form'), rest: val(p + 'Rest'), inj: val(p + 'Injuries'),
+            cf: val(p + 'CF'), cc: val(p + 'CC')
+        });
+        const home = side('h'), away = side('a');
+
+        // ATAQUE: combina xG (calidad de chances), goles reales ya ponderados por forma
+        // reciente, y el rendimiento en su propia condición (local/visitante).
+        // DEFENSA: ahora es simétrica al ataque. Antes se medía SOLO con goles recibidos,
+        // que es la métrica más ruidosa que existe (un portero inspirado o dos desvíos
+        // distorsionan la temporada entera); sumar xGA la estabiliza mucho.
+        const homeAtk = shrink(meanOf([home.xG, home.gf, home.gfCond]), home.mp);
+        const homeDef = shrink(meanOf([home.xGA, home.gc, home.gcCond]), home.mp);
+        const awayAtk = shrink(meanOf([away.xG, away.gf, away.gfCond]), away.mp);
+        const awayDef = shrink(meanOf([away.xGA, away.gc, away.gcCond]), away.mp);
+
+        let lambdaHome = leagueAvg * (homeAtk / leagueAvg) * (awayDef / leagueAvg);
+        let lambdaAway = leagueAvg * (awayAtk / leagueAvg) * (homeDef / leagueAvg);
+
+        // La forma es un ajuste FINO (±13,5%): ya está reflejada en GF/xG y en los
+        // últimos 5 partidos, así que un multiplicador agresivo la contaría doble.
+        const formMult = (f) => 1 + (Math.min(Math.max(f, 1), 10) - 5.5) * 0.03;
+        const restMult = (d) => d < 3 ? 0.88 : (d < 4 ? 0.94 : (d > 10 ? 0.97 : 1.0));
+        const injMult = (pct) => 1 - (Math.min(Math.max(pct, 0), 50) / 100) * 0.5;
+
+        lambdaHome *= formMult(home.form) * homeAdvantage * restMult(home.rest) * injMult(home.inj);
+        lambdaAway *= formMult(away.form) * restMult(away.rest) * injMult(away.inj);
+
+        const contextMultipliers = { normal: 1.0, decisive: 0.93, deadrubber: 1.08 };
+        lambdaHome *= contextMultipliers[matchContext] ?? 1.0;
+        lambdaAway *= contextMultipliers[matchContext] ?? 1.0;
+
+        lambdaHome = Math.max(lambdaHome, 0.05);
+        lambdaAway = Math.max(lambdaAway, 0.05);
+
+        const lambdaCornH = (home.cf + away.cc) / 2;
+        const lambdaCornA = (away.cf + home.cc) / 2;
+
+        return { lambdaHome, lambdaAway, lambdaCornH, lambdaCornA, sample: { h: home.mp, a: away.mp } };
+    }
+
+    // =====================================================================
+    //  ESTADO
+    // =====================================================================
+    let lastMatrix = null, lastMarkets = null, lastLambdas = null;
+
+    function runModel() {
+        const btn = document.getElementById('btnSimulate');
+        const lambdas = calculateLambdas();
+        btn.disabled = true;
+        document.getElementById('progressWrap').style.display = 'block';
+        document.getElementById('resultsGrid').style.display = 'none';
+
+        const matrix = buildScoreMatrix(lambdas.lambdaHome, lambdas.lambdaAway);
+        const markets = computeMarkets(matrix, lambdas.lambdaCornH + lambdas.lambdaCornA);
+        lastMatrix = matrix; lastMarkets = markets; lastLambdas = lambdas;
+
+        // Barra de progreso puramente visual: el cálculo exacto es instantáneo.
+        let pct = 0;
+        const tick = () => {
+            pct += 10;
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressText').innerText = `Resolviendo matriz Dixon-Coles... [${pct}%]`;
+            if (pct < 100) { setTimeout(tick, 40); return; }
+            renderAll();
+            btn.disabled = false;
+            document.getElementById('progressWrap').style.display = 'none';
+        };
+        tick();
+    }
+
+    // =====================================================================
+    //  RENDER PRINCIPAL
+    // =====================================================================
+    function renderAll() {
+        const m = lastMarkets, lambdas = lastLambdas;
+        const hName = document.getElementById('hName').value || 'Local';
+        const aName = document.getElementById('aName').value || 'Visita';
+        const pc = (p) => (p * 100).toFixed(1) + '%';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+
+        set('res1', pc(m.p1)); set('resX', pc(m.pX)); set('res2', pc(m.p2));
+        set('res1X', pc(m.p1X)); set('resX2', pc(m.pX2)); set('res12', pc(m.p12));
+        set('resBtts', pc(m.btts));
+
+        [['05', 0.5], ['15', 1.5], ['25', 2.5], ['35', 3.5], ['45', 4.5]].forEach(([sfx, line]) => {
+            const over = m.goalsOver(line);
+            set('o' + sfx, pc(over));
+            set('u' + sfx, pc(1 - over));
+        });
+        set('o25b', pc(m.goalsOver(2.5)));
+
+        const ct = lambdas.lambdaCornH + lambdas.lambdaCornA;
+        set('resCT', ct.toFixed(2));
+        [7.5, 8.5, 9.5, 10.5, 11.5].forEach(l => {
+            const suffix = String(l).replace('.5', '5');
+            const over = m.cornersOver(l);
+            set('co' + suffix, pc(over));
+            set('cu' + suffix, pc(1 - over));
+        });
+
+        document.getElementById('exactScores').innerHTML = m.scores.slice(0, 6).map(s =>
+            `<div class="stat-row"><span>Resultado ${s.x} - ${s.y}</span> <strong>${pc(s.p)}</strong></div>`
+        ).join('');
+
+        renderDiagnostics(lambdas, m, hName, aName);
+        renderPicks(m, hName, aName);
+        renderMarketCompare(m, hName, aName);
+        renderHeatmap(lastMatrix, hName, aName);
+        renderAsianHandicap(m, hName, aName);
+        renderRadar();
+        document.getElementById('fullMatchReport').innerHTML = '';
+
+        document.getElementById('resultsGrid').style.display = 'grid';
+    }
+
+    // =====================================================================
+    //  NUEVA FUNCIÓN 1 — DIAGNÓSTICO DEL MODELO
+    // =====================================================================
+    // Un modelo alimentado con datos malos escupe probabilidades malas con total
+    // seguridad. Esto revisa las señales de alarma antes de que apuestes.
+    function renderDiagnostics(lambdas, m, hName, aName) {
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const checks = [];
+        const totalG = lambdas.lambdaHome + lambdas.lambdaAway;
+        const totalC = lambdas.lambdaCornH + lambdas.lambdaCornA;
+
+        const push = (level, text) => checks.push({ level, text });
+
+        if (totalG < 1.6) push('warn', `Goles esperados muy bajos (${totalG.toFixed(2)}). Revisá que los goles anotados/recibidos y el promedio de liga sean por partido, no totales de temporada.`);
+        else if (totalG > 4.2) push('warn', `Goles esperados muy altos (${totalG.toFixed(2)}). Una liga top promedia ~2,6-3,1. Revisá si inflaste forma, xG o el promedio de liga.`);
+        else push('ok', `Goles esperados totales: ${totalG.toFixed(2)} (${hName} ${lambdas.lambdaHome.toFixed(2)} – ${aName} ${lambdas.lambdaAway.toFixed(2)}). Dentro del rango realista.`);
+
+        if (totalC < 6 || totalC > 15) push('warn', `Córners esperados fuera de rango habitual (${totalC.toFixed(1)}; lo normal es 8-12).`);
+        else push('ok', `Córners esperados: ${totalC.toFixed(1)}. Rango normal.`);
+
+        const la = val('leagueAvg');
+        if (la < 0.9 || la > 2.2) push('warn', `El promedio de liga (${la}) parece fuera de rango. Debe ser goles por EQUIPO por partido (~1,2-1,7), no el total del partido.`);
+
+        // Divergencia temporada vs últimos 5: señal de que el peso de forma reciente importa mucho
+        const divergence = Math.abs(val('hGF') - val('hGF5')) + Math.abs(val('aGF') - val('aGF5'));
+        if (divergence > 1.4) push('info', `Los últimos 5 partidos difieren bastante del promedio de temporada. El resultado es sensible al "Peso Forma Reciente" (${val('formWeight')}%) — probá moverlo y mirá cuánto cambian los picks.`);
+
+        // Tamaño de muestra: con pocos partidos el encogimiento bayesiano está actuando fuerte
+        const minMP = Math.min(val('hMP') || Infinity, val('aMP') || Infinity);
+        if (minMP !== Infinity && minMP > 0 && minMP < 8) {
+            const pull = (K_PRIOR / (minMP + K_PRIOR) * 100).toFixed(0);
+            push('warn', `Muestra chica (${minMP} partidos). Los promedios a esa altura son en buena parte ruido, así que el modelo está acercando las cifras un ${pull}% hacia el promedio de la liga. Tomá estas probabilidades con pinzas.`);
+        }
+        if (!val('hMP') && !val('aMP')) {
+            push('info', 'No cargaste partidos jugados, así que el ajuste por tamaño de muestra está desactivado. Si estás a principio de temporada, cargalo: evita que 3 partidos raros dominen la proyección.');
+        }
+
+        const missing = [];
+        if (!val('hXGA') || !val('aXGA')) missing.push('xGA');
+        if (!val('hGFCond') || !val('aGFCond')) missing.push('rendimiento local/visitante');
+        if (missing.length) push('info', `Sin datos de ${missing.join(' ni ')}. El modelo funciona igual, pero esos campos son los que más afinan la estimación: el xGA estabiliza la defensa y los splits capturan que un equipo rinde distinto en casa que fuera.`);
+
+        // Overround de las cuotas 1X2
+        const o1 = val('odds1'), oX = val('oddsX'), o2 = val('odds2');
+        if (o1 > 1 && oX > 1 && o2 > 1) {
+            const overround = (1 / o1 + 1 / oX + 1 / o2 - 1) * 100;
+            if (overround < 0) push('warn', `Las cuotas 1X2 suman menos de 100% (${overround.toFixed(1)}% de margen). Eso sería un arbitraje garantizado — casi seguro cargaste mal una cuota.`);
+            else if (overround > 12) push('warn', `Margen de la casa muy alto (${overround.toFixed(1)}%). Con ese vig es muy difícil encontrar valor real.`);
+            else push('ok', `Margen de la casa en 1X2: ${overround.toFixed(1)}% (normal: 3-8%).`);
+        }
+
+        // Coherencia entre forma declarada y datos reales
+        const hStrong = val('hGF') - val('hGC'), aStrong = val('aGF') - val('aGC');
+        if ((hStrong > aStrong && val('hForm') < val('aForm') - 2) || (aStrong > hStrong && val('aForm') < val('hForm') - 2)) {
+            push('info', 'La "Forma Actual" que cargaste contradice el diferencial de goles de los equipos. No es un error, pero revisá que sea intencional.');
+        }
+
+        const icon = { ok: '✅', warn: '⚠️', info: 'ℹ️' };
+        const color = { ok: 'var(--success)', warn: 'var(--warning)', info: 'var(--primary)' };
+        document.getElementById('diagList').innerHTML = checks.map(c =>
+            `<div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; font-size:0.85rem;">
+                <span>${icon[c.level]}</span>
+                <span style="color:${c.level === 'ok' ? 'var(--text-dim)' : color[c.level]};">${c.text}</span>
+            </div>`
+        ).join('');
+    }
+
+    // =====================================================================
+    //  PICKS (ampliados, por categoría, ordenados por probabilidad)
+    // =====================================================================
+    function renderPicks(m, hName, aName) {
+        function build(opt) {
+            const oddsInput = opt.oddsId ? document.getElementById(opt.oddsId) : null;
+            const odds = oddsInput ? (parseFloat(oddsInput.value) || 0) : 0;
+            const hasOdds = odds > 1;
+            const push = opt.push || 0;   // prob. de empuje (reembolso), >0 solo en líneas enteras
+
+            // Con posibilidad de push, apostando 1: ganás (cuota-1), empujás 0, perdés -1.
+            // EV = w*cuota - (1 - push)   y la cuota justa (EV=0) es (1 - push)/w,
+            // NO 1/w: ignorar el reembolso sobreestimaba la cuota mínima necesaria.
+            const ev = hasOdds ? (opt.prob * odds) - (1 - push) : null;
+            const fairOdds = opt.prob > 0 ? (1 - push) / opt.prob : Infinity;
+
+            const inBand = opt.prob >= 0.45 && opt.prob <= 0.95;
+            if (!inBand && !(hasOdds && ev > 0)) return null;
+
+            // Kelly a la mitad (más conservador: el Kelly completo asume que tu
+            // probabilidad estimada es exacta, y nunca lo es). Con push, se condiciona
+            // a que la apuesta se resuelva: p' = w / (1 - push).
+            let kellyPct = null, kellyStake = null;
+            if (hasOdds && ev > 0) {
+                const b = odds - 1;
+                const pResolved = push < 1 ? opt.prob / (1 - push) : 0;
+                kellyPct = Math.max(pResolved - (1 - pResolved) / b, 0) / 2;
+                kellyStake = kellyPct * (parseFloat(document.getElementById('bankroll').value) || 0);
+            }
+            return { ...opt, hasOdds, odds, ev, push, kellyPct, kellyStake, fairOdds };
+        }
+
+        function renderCategory(containerId, options) {
+            const list = options.map(build).filter(Boolean).sort((a, b) => b.prob - a.prob);
+            const container = document.getElementById(containerId);
+            if (!list.length) {
+                container.innerHTML = '<p style="color:var(--text-dim); font-size:0.85rem; grid-column:1/-1;">Sin picks con confianza suficiente en esta categoría.</p>';
+                return;
+            }
+            container.innerHTML = list.map((bet, i) => {
+                // Escalón de color por confianza: 80%+ = morado (máxima confianza)
+                let color = 'var(--success)';
+                if (bet.prob >= 0.80) color = 'var(--purple)';
+                else if (bet.prob < 0.65) color = 'var(--primary)';
+                if (bet.prob < 0.5) color = 'var(--accent)';
+                const elite = bet.prob >= 0.80;
+                const tag = bet.hasOdds
+                    ? (bet.ev > 0
+                        ? `<span class="ev-badge ev-positive" style="margin-left:6px;">VALOR +${(bet.ev * 100).toFixed(1)}%</span>`
+                        : `<span class="ev-badge ev-negative" style="margin-left:6px;">SIN VALOR ${(bet.ev * 100).toFixed(1)}%</span>`)
+                    : `<span class="fair-odds-badge" title="Cuota mínima para que este pick tenga valor" style="margin-left:6px;">Justa: ${bet.fairOdds.toFixed(2)}</span>`;
+                return `
+                <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border:1px solid ${elite ? 'var(--purple)' : 'rgba(255,255,255,0.05)'};${elite ? ' box-shadow:0 0 14px var(--purple-glow);' : ''}">
+                    <div class="stat-row" style="margin-bottom:6px;">
+                        <span><b style="color:var(--text); opacity:0.5;">#${i + 1}</b> ${bet.name}</span>
+                        <div><strong style="color:${color}">${(bet.prob * 100).toFixed(1)}%</strong>${tag}</div>
+                    </div>
+                    <div style="width:100%; height:6px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden;">
+                        <div style="width:${bet.prob * 100}%; height:100%; background:${color}; border-radius:4px;"></div>
+                    </div>
+                    ${bet.kellyStake !== null ? `<div style="font-size:0.72rem; color:var(--warning); margin-top:5px;">💰 Kelly (½): ${(bet.kellyPct * 100).toFixed(1)}% del bankroll ≈ $${bet.kellyStake.toFixed(2)}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        renderCategory('picksGoles', [
+            { name: 'Más de 0.5 Goles', prob: m.goalsOver(0.5) },
+            { name: 'Más de 1.5 Goles', prob: m.goalsOver(1.5) },
+            { name: 'Más de 2.5 Goles', prob: m.goalsOver(2.5), oddsId: 'oddsO25' },
+            { name: 'Más de 3.5 Goles', prob: m.goalsOver(3.5) },
+            { name: 'Menos de 1.5 Goles', prob: 1 - m.goalsOver(1.5) },
+            { name: 'Menos de 2.5 Goles', prob: 1 - m.goalsOver(2.5) },
+            { name: 'Menos de 3.5 Goles', prob: 1 - m.goalsOver(3.5) },
+            { name: 'Menos de 4.5 Goles', prob: 1 - m.goalsOver(4.5) },
+        ]);
+
+        renderCategory('picksCorners', [
+            { name: 'Más de 7.5 Córners', prob: m.cornersOver(7.5) },
+            { name: 'Más de 8.5 Córners', prob: m.cornersOver(8.5) },
+            { name: 'Más de 9.5 Córners', prob: m.cornersOver(9.5) },
+            { name: 'Menos de 9.5 Córners', prob: 1 - m.cornersOver(9.5) },
+            { name: 'Menos de 10.5 Córners', prob: 1 - m.cornersOver(10.5) },
+            { name: 'Menos de 11.5 Córners', prob: 1 - m.cornersOver(11.5) },
+        ]);
+
+        renderCategory('picksGanador', [
+            { name: `Victoria ${hName} (1)`, prob: m.p1, oddsId: 'odds1' },
+            { name: 'Empate (X)', prob: m.pX, oddsId: 'oddsX' },
+            { name: `Victoria ${aName} (2)`, prob: m.p2, oddsId: 'odds2' },
+            { name: `1X (${hName} o Empate)`, prob: m.p1X },
+            { name: `X2 (${aName} o Empate)`, prob: m.pX2 },
+            { name: '12 (Cualquiera Gana)', prob: m.p12 },
+        ]);
+
+        renderCategory('picksEquipos', [
+            { name: `${hName} marca (+0.5)`, prob: m.homeOver(0.5) },
+            { name: `${hName} marca 2+ (+1.5)`, prob: m.homeOver(1.5) },
+            { name: `${aName} marca (+0.5)`, prob: m.awayOver(0.5) },
+            { name: `${aName} marca 2+ (+1.5)`, prob: m.awayOver(1.5) },
+            { name: `${hName} no recibe gol`, prob: m.homeCleanSheet },
+            { name: `${aName} no recibe gol`, prob: m.awayCleanSheet },
+        ]);
+
+        const ahOptions = [];
+        [-1.5, -1, -0.5, 0, 0.5, 1, 1.5].forEach(line => {
+            const { win, push } = m.handicap(line);
+            const label = line > 0 ? `+${line}` : `${line}`;
+            // El % de victoria de una línea entera coincide con el de la línea .5 vecina;
+            // lo que las diferencia es el reembolso, así que lo mostramos en el nombre.
+            const suffix = push > 0.0005 ? ` <span style="color:var(--text-dim); font-size:0.78rem;">· reembolso ${(push * 100).toFixed(1)}%</span>` : '';
+            ahOptions.push({ name: `${hName} (${label})${suffix}`, prob: win, push });
+        });
+        renderCategory('picksHandicap', ahOptions);
+
+        renderCategory('picksExtra', [
+            { name: 'Ambos Anotan (Sí)', prob: m.btts, oddsId: 'oddsBTTS' },
+            { name: 'Ambos Anotan (No)', prob: 1 - m.btts },
+            { name: `${hName} gana por 2+`, prob: m.homeBy2plus },
+            { name: `${aName} gana por 2+`, prob: m.awayBy2plus },
+            { name: `${hName} gana sin recibir gol`, prob: m.homeWinToNil },
+            { name: `${aName} gana sin recibir gol`, prob: m.awayWinToNil },
+        ]);
+    }
+
+    // =====================================================================
+    //  NUEVA FUNCIÓN 2 — MODELO VS MERCADO (quitando el vig)
+    // =====================================================================
+    // Las cuotas de la casa incluyen su margen, así que 1/cuota NO es la probabilidad
+    // que el mercado realmente cree. Normalizando las tres cuotas quitamos el margen y
+    // obtenemos la probabilidad implícita limpia, comparable con la del modelo.
+    function renderMarketCompare(m, hName, aName) {
+        const container = document.getElementById('marketCompare');
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const o1 = val('odds1'), oX = val('oddsX'), o2 = val('odds2');
+
+        if (!(o1 > 1 && oX > 1 && o2 > 1)) {
+            container.innerHTML = '<p style="color:var(--text-dim); font-size:0.85rem;">Cargá las tres cuotas 1X2 (arriba, en la tarjeta 1X2) para comparar tu modelo contra el mercado.</p>';
+            return;
+        }
+
+        const raw = [1 / o1, 1 / oX, 1 / o2];
+        const overround = raw[0] + raw[1] + raw[2];
+        const fair = raw.map(r => r / overround);
+        const model = [m.p1, m.pX, m.p2];
+        const labels = [`Victoria ${hName}`, 'Empate', `Victoria ${aName}`];
+        const odds = [o1, oX, o2];
+
+        const rows = labels.map((label, i) => {
+            const edge = model[i] - fair[i];
+            const evPct = (model[i] * odds[i] - 1) * 100;
+            const edgeColor = edge > 0.02 ? 'var(--success)' : (edge < -0.02 ? 'var(--danger)' : 'var(--text-dim)');
+            const sign = edge >= 0 ? '+' : '';
+            return `
+            <div class="stat-row" style="border-bottom:1px solid var(--border); padding-bottom:8px;">
+                <span style="flex:1;">${label}</span>
+                <div style="display:flex; gap:18px; align-items:center; font-family:'Space Grotesk';">
+                    <span style="color:var(--text-dim); font-size:0.8rem;">Mercado <b style="color:#fff;">${(fair[i] * 100).toFixed(1)}%</b></span>
+                    <span style="color:var(--text-dim); font-size:0.8rem;">Modelo <b style="color:var(--primary);">${(model[i] * 100).toFixed(1)}%</b></span>
+                    <span style="color:${edgeColor}; font-weight:700; min-width:64px; text-align:right;">${sign}${(edge * 100).toFixed(1)} pts</span>
+                    <span class="ev-badge ${evPct > 0 ? 'ev-positive' : 'ev-negative'}">${evPct > 0 ? '+' : ''}${evPct.toFixed(1)}% EV</span>
+                </div>
+            </div>`;
+        }).join('');
+
+        const biggest = [0, 1, 2].reduce((best, i) => (model[i] - fair[i]) > (model[best] - fair[best]) ? i : best, 0);
+        const biggestEdge = model[biggest] - fair[biggest];
+
+        container.innerHTML = rows + `
+            <p style="font-size:0.78rem; color:var(--text-dim); margin-top:14px;">
+                Margen de la casa: <b style="color:var(--warning);">${((overround - 1) * 100).toFixed(1)}%</b> (ya descontado de la columna "Mercado").
+                ${biggestEdge > 0.02
+                    ? `Tu mayor desacuerdo es en <b style="color:var(--text);">${labels[biggest]}</b>, donde el modelo va ${(biggestEdge * 100).toFixed(1)} puntos por encima del mercado. Eso es una ventaja solo si tus datos de entrada son mejores que los de la casa — si no, es tu modelo equivocándose.`
+                    : 'Tu modelo está esencialmente de acuerdo con el mercado en los tres resultados: no hay ventaja clara aquí.'}
+            </p>`;
+    }
+
+    // =====================================================================
+    //  MAPA DE CALOR
+    // =====================================================================
+    function renderHeatmap(matrix, hName, aName) {
+        const container = document.getElementById('scoreHeatmap');
+        if (!matrix) { container.innerHTML = ''; return; }
+        const N = 5, size = N + 2;
+        const display = Array.from({ length: size }, () => new Array(size).fill(0));
+        const bucket = (g) => Math.min(g, N + 1);
+        for (let x = 0; x < matrix.length; x++)
+            for (let y = 0; y < matrix[x].length; y++)
+                display[bucket(x)][bucket(y)] += matrix[x][y];
+
+        let maxP = 0, bi = 0, bj = 0;
+        for (let i = 0; i < size; i++) for (let j = 0; j < size; j++)
+            if (display[i][j] > maxP) { maxP = display[i][j]; bi = i; bj = j; }
+
+        const lbl = (i) => (i <= N ? i : `${N + 1}+`);
+        let html = `<div class="heat-grid" style="grid-template-columns:60px repeat(${size},1fr); max-width:${60 + size * 50}px; margin:0 auto;">`;
+        html += `<div class="heat-label"></div>`;
+        for (let j = 0; j < size; j++) html += `<div class="heat-label">${lbl(j)}</div>`;
+        for (let i = 0; i < size; i++) {
+            html += `<div class="heat-label">${lbl(i)}</div>`;
+            for (let j = 0; j < size; j++) {
+                const p = display[i][j], rel = maxP > 0 ? p / maxP : 0;
+                html += `<div class="heat-cell${i === bi && j === bj ? ' heat-best' : ''}" style="background:rgba(0,229,255,${(0.08 + rel * 0.78).toFixed(2)});" title="${hName} ${lbl(i)} - ${aName} ${lbl(j)}: ${(p * 100).toFixed(1)}%">${(p * 100).toFixed(1)}</div>`;
+            }
+        }
+        html += `</div><p style="font-size:0.75rem; color:var(--text-dim); margin-top:12px; text-align:center;">Filas = goles de <b style="color:var(--primary)">${hName}</b> · Columnas = goles de <b style="color:var(--accent)">${aName}</b> · borde dorado = marcador más probable.</p>`;
+        container.innerHTML = html;
+    }
+
+    // =====================================================================
+    //  HÁNDICAP ASIÁTICO (exacto)
+    // =====================================================================
+    function renderAsianHandicap(m, hName, aName) {
+        const lines = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2];
+        const rows = lines.map(line => {
+            const { win, push } = m.handicap(line);
+            const label = line > 0 ? `+${line}` : `${line}`;
+            const near = Math.abs(win - 0.5) < 0.03;
+            return `
+            <div class="stat-row" style="${near ? 'background:rgba(0,229,255,0.06); border-radius:6px; padding:6px 10px;' : 'padding:0 2px;'}">
+                <span>${hName} (${label})${near ? ' <span class="fair-odds-badge" style="margin-left:6px;">línea ~pareja</span>' : ''}</span>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    ${push > 0.0005 ? `<span style="font-size:0.78rem; color:var(--text-dim);">Push: ${(push * 100).toFixed(1)}%</span>` : ''}
+                    <strong style="color:var(--primary)">${(win * 100).toFixed(1)}%</strong>
+                    <span class="fair-odds-badge">Justa: ${win > 0 ? (1 / win).toFixed(2) : '--'}</span>
+                </div>
+            </div>`;
+        }).join('');
+        document.getElementById('ahTable').innerHTML = rows +
+            `<p style="font-size:0.75rem; color:var(--text-dim); margin-top:10px;">% = probabilidad de que <b style="color:var(--primary)">${hName}</b> cubra esa línea.</p>`;
+    }
+
+    // =====================================================================
+    //  RADAR
+    // =====================================================================
+    function renderRadar() {
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const w = Math.min(Math.max(val('formWeight') / 100, 0), 1);
+        const blend = (s, r) => s * (1 - w) + r * w;
+        const hName = document.getElementById('hName').value || 'Local';
+        const aName = document.getElementById('aName').value || 'Visita';
+
+        const nAtk = (v) => Math.min(v / 3, 1) * 100;
+        const nDef = (v) => (1 - Math.min(v / 3, 1)) * 100;
+        const nForm = (v) => Math.min(v / 10, 1) * 100;
+        const nRest = (v) => Math.min(v / 8, 1) * 100;
+        const nCor = (v) => Math.min(v / 9, 1) * 100;
+
+        const axes = ['Ataque', 'Defensa', 'Forma', 'Frescura', 'Córners'];
+        const hv = [nAtk(blend(val('hGF'), val('hGF5'))), nDef(blend(val('hGC'), val('hGC5'))), nForm(val('hForm')), nRest(val('hRest')), nCor(val('hCF'))];
+        const av = [nAtk(blend(val('aGF'), val('aGF5'))), nDef(blend(val('aGC'), val('aGC5'))), nForm(val('aForm')), nRest(val('aRest')), nCor(val('aCF'))];
+
+        const size = 300, c = size / 2, maxR = size / 2 - 55, n = axes.length;
+        const pt = (i, v) => {
+            const a = (-90 + i * (360 / n)) * Math.PI / 180, r = (v / 100) * maxR;
+            return [c + r * Math.cos(a), c + r * Math.sin(a)];
+        };
+        const poly = (vals) => vals.map((v, i) => pt(i, v).join(',')).join(' ');
+        let grid = '';
+        [20, 40, 60, 80, 100].forEach(p => { grid += `<polygon points="${axes.map((_, i) => pt(i, p).join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,0.08)"/>`; });
+        let ax = '';
+        axes.forEach((l, i) => {
+            const [x, y] = pt(i, 100), [lx, ly] = pt(i, 122);
+            ax += `<line x1="${c}" y1="${c}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.12)"/>`;
+            ax += `<text x="${lx}" y="${ly}" fill="#8b92a5" font-size="11" font-family="Montserrat,sans-serif" text-anchor="middle" dominant-baseline="middle">${l}</text>`;
+        });
+        const dots = (v, col) => v.map((x, i) => { const [a, b] = pt(i, x); return `<circle cx="${a}" cy="${b}" r="3" fill="${col}"/>`; }).join('');
+
+        document.getElementById('radarChart').innerHTML = `
+            <svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:300px;" xmlns="http://www.w3.org/2000/svg">
+                ${grid}${ax}
+                <polygon points="${poly(hv)}" fill="rgba(0,229,255,0.22)" stroke="#00e5ff" stroke-width="2"/>
+                <polygon points="${poly(av)}" fill="rgba(255,0,85,0.16)" stroke="#ff0055" stroke-width="2"/>
+                ${dots(hv, '#00e5ff')}${dots(av, '#ff0055')}
+            </svg>
+            <div style="display:flex; gap:20px; justify-content:center; margin-top:6px; font-size:0.8rem;">
+                <span style="color:#00e5ff;">● ${hName}</span><span style="color:#ff0055;">● ${aName}</span>
+            </div>`;
+    }
+
+    // =====================================================================
+    //  PARTIDO COMPLETO
+    // =====================================================================
+    function renderFullMatch() {
+        const box = document.getElementById('fullMatchReport');
+        if (!lastMatrix || !lastMarkets) {
+            box.innerHTML = '<p style="color:var(--danger); font-size:0.85rem;">Primero tocá "CALCULAR PROBABILIDADES" para generar el partido.</p>';
+            return;
+        }
+        const hName = document.getElementById('hName').value || 'Local';
+        const aName = document.getElementById('aName').value || 'Visita';
+        const best = lastMarkets.scores[0];
+        const hg = best.x, ag = best.y, bestP = best.p;
+        const hc = Math.max(0, Math.floor(lastLambdas.lambdaCornH));
+        const ac = Math.max(0, Math.floor(lastLambdas.lambdaCornA));
+
+        const minutes = (count) => Array.from({ length: count }, () =>
+            Math.random() < 0.55 ? 46 + Math.floor(Math.random() * 45) : 1 + Math.floor(Math.random() * 45)
+        ).sort((a, b) => a - b);
+        const hM = minutes(hg), aM = minutes(ag);
+        const htH = hM.filter(x => x <= 45).length, htA = aM.filter(x => x <= 45).length;
+
+        const estSOT = (g, l) => Math.max(g, Math.round(l / 0.37));
+        const hSOT = estSOT(hg, lastLambdas.lambdaHome), aSOT = estSOT(ag, lastLambdas.lambdaAway);
+        const hSh = Math.max(hSOT, Math.round(hSOT / 0.42)), aSh = Math.max(aSOT, Math.round(aSOT / 0.42));
+        let hPos = Math.round(100 * lastLambdas.lambdaHome / (lastLambdas.lambdaHome + lastLambdas.lambdaAway));
+        hPos = Math.min(70, Math.max(30, hPos));
+
+        const timeline = [...hM.map(m => ({ m, home: true })), ...aM.map(m => ({ m, home: false }))].sort((a, b) => a.m - b.m);
+        const tHTML = timeline.length
+            ? timeline.map(g => `<div class="stat-row" style="padding:4px 0; margin-bottom:0;"><span style="color:${g.home ? 'var(--primary)' : 'var(--accent)'};">⚽ ${g.m}' — ${g.home ? hName : aName}</span></div>`).join('')
+            : '<p style="color:var(--text-dim); font-size:0.85rem;">Sin goles en este marcador.</p>';
+
+        box.innerHTML = `
+            <div style="text-align:center; margin-bottom:10px;"><span class="fair-odds-badge" style="font-size:0.7rem;">SIMULACIÓN — no es un resultado real</span></div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:24px; margin-bottom:6px; flex-wrap:wrap;">
+                <span style="font-family:'Space Grotesk'; font-size:1.3rem; color:var(--primary); font-weight:700;">${hName}</span>
+                <span style="font-family:'Space Grotesk'; font-size:2.4rem; font-weight:900;">${hg} - ${ag}</span>
+                <span style="font-family:'Space Grotesk'; font-size:1.3rem; color:var(--accent); font-weight:700;">${aName}</span>
+            </div>
+            <div style="text-align:center; color:var(--text-dim); font-size:0.85rem; margin-bottom:22px;">Descanso: ${htH} - ${htA} · Marcador más probable (${(bestP * 100).toFixed(1)}%)</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px;">
+                <div>
+                    <h4 style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; margin-bottom:10px;">⏱️ Minuto a Minuto</h4>${tHTML}
+                </div>
+                <div>
+                    <h4 style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; margin-bottom:10px;">📊 Estadísticas</h4>
+                    <div class="stat-row"><span>Posesión</span><strong>${hPos}% - ${100 - hPos}%</strong></div>
+                    <div class="stat-row"><span>Tiros (a puerta)</span><strong>${hSh} (${hSOT}) - ${aSh} (${aSOT})</strong></div>
+                    <div class="stat-row"><span>Córners</span><strong>${hc} - ${ac}</strong></div>
+                    <div class="stat-row"><span>Ambos Anotan</span><strong>${hg > 0 && ag > 0 ? 'Sí' : 'No'}</strong></div>
+                </div>
+            </div>
+            <p style="font-size:0.7rem; color:var(--text-dim); margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">Marcador y córners = valores de mayor probabilidad del modelo. Minutos, tiros y posesión son estimaciones ilustrativas, no salen del cálculo probabilístico.</p>`;
+    }
+
+    // =====================================================================
+    //  CUOTAS / EV
+    // =====================================================================
+    function refreshOdds() {
+        if (!lastMarkets) return;
+        const m = lastMarkets;
+        const check = (prob, oddsId, badgeId) => {
+            const odds = parseFloat(document.getElementById(oddsId).value) || 0;
+            const badge = document.getElementById(badgeId);
+            if (odds <= 1) { badge.innerText = '--'; badge.className = 'ev-badge'; return; }
+            const ev = (prob * odds - 1) * 100;
+            badge.innerText = `${ev > 0 ? '+' : ''}${ev.toFixed(1)}% EV`;
+            badge.className = 'ev-badge ' + (ev > 0 ? 'ev-positive' : 'ev-negative');
+        };
+        check(m.p1, 'odds1', 'ev1');
+        check(m.pX, 'oddsX', 'evX');
+        check(m.p2, 'odds2', 'ev2');
+        check(m.goalsOver(2.5), 'oddsO25', 'evO25');
+        check(m.btts, 'oddsBTTS', 'evBTTS');
+
+        const hName = document.getElementById('hName').value || 'Local';
+        const aName = document.getElementById('aName').value || 'Visita';
+        renderPicks(m, hName, aName);
+        renderMarketCompare(m, hName, aName);
+        renderDiagnostics(lastLambdas, m, hName, aName);
+    }
+
+    // =====================================================================
+    //  CARGA RÁPIDA
+    // =====================================================================
+    const QUICK_FIELDS = ['XG', 'XGA', 'GF', 'GC', 'GF5', 'GC5', 'GFCond', 'GCCond', 'MP', 'Form', 'Rest', 'Injuries', 'CF', 'CC'];
+    const QUICK_LABELS = ['xG', 'xGA', 'GF', 'GC', 'GF(Últ.5)', 'GC(Últ.5)', 'GF(condición)', 'GC(condición)', 'PJ', 'Forma', 'Descanso', 'Bajas%', 'CF', 'CC'];
+
+    function syncQuickLoadArea() {
+        const line = (p) => [document.getElementById(p + 'Name').value,
+            ...QUICK_FIELDS.map(f => document.getElementById(p + f).value)].join(', ');
+        document.getElementById('quickLoadArea').value = line('h') + '\n' + line('a');
+    }
+
+    function quickLoadBoth() {
+        const raw = document.getElementById('quickLoadArea').value.trim();
+        if (!raw) return;
+        const EXPECTED = QUICK_FIELDS.length + 1; // nombre + datos
+        const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length !== 2) {
+            alert(`Necesito exactamente 2 líneas (Local primero). Encontré ${lines.length}.\n\nFormato:\nNombre, ${QUICK_LABELS.join(', ')}`);
+            return;
+        }
+        // Validar ambas líneas ANTES de aplicar nada (todo o nada)
+        const parse = (line, label) => {
+            const parts = line.split(/[,;\t]+/).map(s => s.trim()).filter(Boolean);
+            if (parts.length !== EXPECTED) return { error: `${label}: esperaba ${EXPECTED} valores (nombre + ${QUICK_FIELDS.length} datos) y encontré ${parts.length}.` };
+            const [name, ...nums] = parts;
+            if (!name) return { error: `${label}: falta el nombre del equipo.` };
+            for (let i = 0; i < nums.length; i++)
+                if (isNaN(parseFloat(nums[i])))
+                    return { error: `${label}: "${QUICK_LABELS[i]}" ("${nums[i]}") no es un número válido.` };
+            return { name, nums };
+        };
+        const H = parse(lines[0], 'Línea 1 (Local)'), A = parse(lines[1], 'Línea 2 (Visita)');
+        const errs = [H.error, A.error].filter(Boolean);
+        if (errs.length) { alert('No pude cargar los datos (no se modificó nada):\n\n' + errs.join('\n')); return; }
+
+        const apply = (d, p) => {
+            document.getElementById(p + 'Name').value = d.name;
+            QUICK_FIELDS.forEach((f, i) => { document.getElementById(p + f).value = d.nums[i]; });
+        };
+        apply(H, 'h'); apply(A, 'a');
+        const btn = document.getElementById('quickLoadBtn'), orig = btn.innerText;
+        btn.innerText = '✅ ¡Cargado!';
+        setTimeout(() => { btn.innerText = orig; }, 1500);
+    }
+
+    // =====================================================================
+    //  PRESETS
+    // =====================================================================
+    const PRESETS = {
+        clasico: {
+            //            xG    xGA   GF    GC    GF5   GC5   GFc   GCc   PJ  Forma Desc Bajas CF    CC
+            h: ['Real Madrid', '2.10', '0.95', '2.30', '0.90', '2.60', '0.80', '2.55', '0.75', '20', '8.5', '6', '0', '6.5', '3.5'],
+            a: ['Barcelona', '1.95', '1.15', '2.10', '1.05', '1.80', '1.20', '1.85', '1.30', '20', '8.0', '5', '10', '6.0', '4.0'],
+        },
+        derby: {
+            h: ['Man City', '2.25', '0.85', '2.40', '0.80', '2.60', '0.60', '2.70', '0.65', '20', '9.0', '7', '5', '7.0', '3.2'],
+            a: ['Arsenal', '1.80', '0.85', '1.90', '0.75', '2.00', '0.80', '1.75', '0.90', '20', '8.5', '7', '0', '6.3', '3.8'],
+        }
+    };
+
+    function loadPreset(type) {
+        const p = PRESETS[type];
+        if (!p) return;
+        const apply = (arr, prefix) => {
+            document.getElementById(prefix + 'Name').value = arr[0];
+            QUICK_FIELDS.forEach((f, i) => { document.getElementById(prefix + f).value = arr[i + 1]; });
+        };
+        apply(p.h, 'h'); apply(p.a, 'a');
+        syncQuickLoadArea();
+    }
+
+    // =====================================================================
+    //  NUEVA FUNCIÓN 3 — GUARDAR / CARGAR PARTIDOS
+    // =====================================================================
+    // Reemplaza el viejo "Guardar Entrada", que solo guardaba 4 de los 22 campos
+    // y nunca los volvía a cargar (no servía para nada). Esto guarda el partido
+    // completo, lo lista y lo restaura.
+    const ALL_FIELDS = [
+        'hName', ...QUICK_FIELDS.map(f => 'h' + f),
+        'aName', ...QUICK_FIELDS.map(f => 'a' + f),
+        'leagueAvg', 'homeAdv', 'formWeight', 'matchContext', 'bankroll',
+        'odds1', 'oddsX', 'odds2', 'oddsO25', 'oddsBTTS'
+    ];
+    const STORE_KEY = 'rsg_saved_matches';
+
+    function readStore() {
+        try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+        catch (e) { return []; }
+    }
+    function writeStore(list) {
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); return true; }
+        catch (e) { alert('No pude guardar: el almacenamiento del navegador no está disponible aquí.'); return false; }
+    }
+
+    function refreshSavedList() {
+        const sel = document.getElementById('savedMatches');
+        const list = readStore();
+        sel.innerHTML = '<option value="">🗂️ Partidos guardados…</option>' +
+            list.map((mt, i) => `<option value="${i}">${mt.label}</option>`).join('');
+    }
+
+    function saveMatch() {
+        const hName = document.getElementById('hName').value || 'Local';
+        const aName = document.getElementById('aName').value || 'Visita';
+        const data = {};
+        ALL_FIELDS.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+        const stamp = new Date().toLocaleDateString('es', { day: '2-digit', month: '2-digit' });
+        const list = readStore();
+        list.unshift({ label: `${hName} vs ${aName} (${stamp})`, data });
+        if (writeStore(list.slice(0, 20))) { refreshSavedList(); alert('✅ Partido guardado.'); }
+    }
+
+    function loadSavedMatch() {
+        const idx = document.getElementById('savedMatches').value;
+        if (idx === '') { alert('Elegí un partido guardado de la lista.'); return; }
+        const entry = readStore()[Number(idx)];
+        if (!entry) return;
+        Object.entries(entry.data).forEach(([id, v]) => {
+            const el = document.getElementById(id);
+            if (el) el.value = v;
+        });
+        syncQuickLoadArea();
+        alert('📂 Partido cargado. Tocá "CALCULAR PROBABILIDADES".');
+    }
+
+    function deleteSavedMatch() {
+        const sel = document.getElementById('savedMatches');
+        if (sel.value === '') { alert('Elegí un partido guardado para borrar.'); return; }
+        const list = readStore();
+        list.splice(Number(sel.value), 1);
+        if (writeStore(list)) refreshSavedList();
+    }
+
+    // Init
+    syncQuickLoadArea();
+    refreshSavedList();
+</script>
+</body>
+</html>
